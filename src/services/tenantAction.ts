@@ -23,8 +23,16 @@ export const getAllTenants = async (page = 0, size = 10): Promise<Pagination<Ten
 }
 
 
+interface CreateTenantDto {
+    name: string;
+    email: string;
+    phone?: string;
+    companyName?: string;
+    status?: 'ACTIVE' | 'INACTIVE';
+    adminId?: string;
+}
 
-export const createTenant = async (data: Partial<Tenant>): Promise<Tenant> => {
+export const createTenant = async (data: CreateTenantDto): Promise<Tenant> => {
     try {
         const response = await api.post('/tenants', data);
         return response.data;

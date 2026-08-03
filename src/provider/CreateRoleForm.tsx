@@ -149,6 +149,13 @@ const CreateRoleForm = () => {
             {createRoleMutation.isPending
               ? "Creating..."
               : "Create"}
+          </Button><Button
+            type="submit"
+            disabled={createRoleMutation.isPending}
+          >
+            {createRoleMutation.isPending
+              ? "Creating..."
+              : "Create"}
           </Button>
         </DialogFooter>
       </form>

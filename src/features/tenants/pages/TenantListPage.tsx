@@ -32,58 +32,58 @@ export const TenantListPage = () => {
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
 
   const [currentPage, setCurrentPage] = useState(0);
-    const [pageSize, setPageSize] = useState(10);
-  
-    const {
-      data: tenants,
-      isLoading,
-      error,
-    } = useQuery({
-      queryKey: ["tenants", currentPage, pageSize],
-      queryFn: () => getAllTenants(currentPage, pageSize),
-      staleTime: 0,
-      refetchOnMount: "always",
-    });
+  const [pageSize, setPageSize] = useState(10);
+
+  const {
+    data: tenants,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["tenants", currentPage, pageSize],
+    queryFn: () => getAllTenants(currentPage, pageSize),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
 
   const { onOpen } = useAddTenantModal();
 
   const createMutation = useMutation({
     mutationFn: createTenant,
-    onSuccess: () => { 
-      queryClient.invalidateQueries({ queryKey: ['tenants'] }); 
-      toast.success('Tenant created successfully'); 
-      setFormOpen(false); 
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      toast.success('Tenant created successfully');
+      setFormOpen(false);
     },
     onError: () => toast.error('Failed to create tenant'),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Tenant> }) => updateTenant(id, data),
-    onSuccess: () => { 
-      queryClient.invalidateQueries({ queryKey: ['tenants'] }); 
-      toast.success('Tenant updated successfully'); 
-      setFormOpen(false); 
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      toast.success('Tenant updated successfully');
+      setFormOpen(false);
     },
     onError: () => toast.error('Failed to update tenant'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteTenant,
-    onSuccess: () => { 
-      queryClient.invalidateQueries({ queryKey: ['tenants'] }); 
-      toast.success('Tenant deleted successfully'); 
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      toast.success('Tenant deleted successfully');
     },
     onError: () => toast.error('Failed to delete tenant'),
   });
 
-  const handleCreate = () => { 
-    setSelectedTenant(null); 
-    onOpen(); 
+  const handleCreate = () => {
+    setSelectedTenant(null);
+    onOpen();
   };
-  
-  const handleEdit = (tenant: Tenant) => { 
-    setSelectedTenant(tenant); 
-    setFormOpen(true); 
+
+  const handleEdit = (tenant: Tenant) => {
+    setSelectedTenant(tenant);
+    setFormOpen(true);
   };
 
   const columns: ColumnDef<Tenant>[] = [
@@ -115,42 +115,76 @@ export const TenantListPage = () => {
             <Button size="sm" variant="ghost" onClick={() => handleEdit(tenant)}>
               <Pencil className="h-4 w-4" />
             </Button>
-            
-            <AlertDialog>
-              <AlertDialogTrigger >
-                <Button size="sm" variant="ghost" className="hover:bg-destructive/10">
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete company{' '}
-                    <span className="font-semibold text-foreground">{tenant.name}</span> and all associated data.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel disabled={deleteMutation.isPending}>
-                    Cancel
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    disabled={deleteMutation.isPending}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      deleteMutation.mutate(tenant.id);
-                    }}
+
+
+            <>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  // setId(role.id);
+                  // onUpdateOpen()
+                }}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+
+
+              <AlertDialog>
+
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="hover:bg-destructive/10"
                   >
-                    {deleteMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      'Delete'
-                    )}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </AlertDialogTrigger>
+
+
+                <AlertDialogContent>
+
+                  <AlertDialogHeader>
+
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+
+                    <AlertDialogDescription>
+                      This will permanently delete{" "}
+                      <span className="font-semibold">
+                        {tenant.name}
+                      </span>.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel
+                      disabled={deleteMutation.isPending}
+                    >
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      disabled={deleteMutation.isPending}
+                      className="bg-destructive"
+                      onClick={() =>
+                        deleteMutation.mutate(tenant.id)
+                      }
+                    >
+                      {deleteMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Delete"
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+
+                </AlertDialogContent>
+
+              </AlertDialog>
+            </>
+
+
           </div>
         );
       },

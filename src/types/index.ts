@@ -99,6 +99,9 @@ export interface Tenant {
   phone?: string;
   createdAt: string;
   updatedAt: string;
+  companyName: string,
+  adminId: string
+
 }
 
 

@@ -3,7 +3,7 @@
 import React from "react";
 import Modal from "./Modal";
 import useAddTenantModal from "@/hooks/useAddTenantModal";
-import AddTenantForm from "./AddTenantForm";
+import CreateTenantForm from "./CreateTenantForm";
 
 const AddTenantModal = () => {
   const { isOpen, onOpen, onClose } = useAddTenantModal();
@@ -14,7 +14,7 @@ const AddTenantModal = () => {
       isOpen={isOpen}
       onChange={onClose}
     >
-      <AddTenantForm />
+      <CreateTenantForm />
     </Modal>
   );
 };
