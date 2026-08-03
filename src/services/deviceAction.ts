@@ -1,9 +1,9 @@
 import { Pagination, Device } from "@/types";
 import { api } from "./api";
 
-export const getAllDevices = async ():Promise<Pagination<Device>> =>{
+export const getAllDevices = async (page = 0, size = 10): Promise<Pagination<Device>> =>{
     try {
-        const response = await api.get('/query/devices');
+        const response = await api.get(`/query/devices?page=${page}&size=${size}`);
         return response.data;
     } catch (error) {
         throw new Error('Failed to fetch devices');

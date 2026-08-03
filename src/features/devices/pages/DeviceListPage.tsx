@@ -24,6 +24,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import useAddDeviceModal from '@/hooks/useAddDeviceModal';
+import { getAllDevices } from '@/services/deviceAction';
 
 export const DeviceListPage = () => {
   const navigate = useNavigate();
@@ -31,11 +32,21 @@ export const DeviceListPage = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
-  // const { data: devices, isLoading, error, refetch } = useQuery({
-  //   queryKey: ['devices'],
-  //   queryFn: () => mockDeviceApi.list(0, 50).then(res => res.content),
-  // });
+   const {
+      data: devices,
+      isLoading,
+      error,
+    } = useQuery({
+      queryKey: ["devices", currentPage, pageSize],
+      queryFn: () => getAllDevices(currentPage, pageSize),
+      staleTime: 0,
+      refetchOnMount: "always",
+    });
+  console.log(devices)
+   
 
   // const { data: teams = [] } = useQuery({
   //   queryKey: ['teams-for-device-form'],
@@ -81,9 +92,10 @@ export const DeviceListPage = () => {
   };
 
   const columns: ColumnDef<Device>[] = [
-    { accessorKey: 'name', header: 'Device Name' },
-    { accessorKey: 'deviceId', header: 'Device ID' },
-    { accessorKey: 'type', header: 'Type' },
+   
+    { accessorKey: 'deviceName', header: 'Name' },
+    {accessorKey: 'hostname', header: 'Hostname' }, 
+    {accessorKey: 'ipAddress', header: 'IP Address' }, 
     {
       accessorKey: 'status',
       header: 'Status',
@@ -148,8 +160,28 @@ export const DeviceListPage = () => {
 
       <Card>
         <CardContent>
-          {/* <DataTable columns={columns} data={devices || []} searchKey="name" searchPlaceholder="Search devices by name, ID, or location..." /> */}
-        </CardContent>
+          <DataTable
+            columns={columns}
+            data={devices?.content || []}
+            searchKey="name"
+            searchPlaceholder="Search devices..."
+            manualPagination
+            pageCount={devices?.totalPages || 0}
+            pagination={{ pageIndex: currentPage, pageSize }}
+            onPaginationChange={(updater) => {
+              const next =
+                typeof updater === "function"
+                  ? updater({ pageIndex: currentPage, pageSize })
+                  : updater;
+              setCurrentPage(next.pageIndex);
+            }}
+            totalElements={devices?.totalElements || 0}
+            pageSizeOptions={[5, 10, 20, 50]}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setCurrentPage(0);
+            }}
+          /></CardContent>
       </Card>
 
       {/* <DeviceForm
