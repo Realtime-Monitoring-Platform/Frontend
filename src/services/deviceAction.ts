@@ -1,4 +1,4 @@
-import { Pagination, Device } from "@/types";
+import { Pagination, Device, createDeviceDto } from "@/types";
 import { api } from "./api";
 
 export const getAllDevices = async (page = 0, size = 10): Promise<Pagination<Device>> =>{
@@ -10,7 +10,7 @@ export const getAllDevices = async (page = 0, size = 10): Promise<Pagination<Dev
     }
 }
 
-export const createDevice = async (data: Partial<Device>): Promise<Device> => {
+export const createDevice = async (data: Partial<createDeviceDto>): Promise<Device> => {
     try {
         const response = await api.post('/devices', data);
         return response.data;

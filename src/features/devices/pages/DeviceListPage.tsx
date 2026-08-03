@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
-import { Download, RefreshCw, Plus, Pencil, Trash2, Eye, Terminal } from 'lucide-react';
+import { Download, RefreshCw, Plus, Pencil, Trash2, Eye, Terminal, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import useAddDeviceModal from '@/hooks/useAddDeviceModal';
-import { getAllDevices } from '@/services/deviceAction';
+import { deleteDevice, getAllDevices } from '@/services/deviceAction';
 
 export const DeviceListPage = () => {
   const navigate = useNavigate();
@@ -35,18 +35,18 @@ export const DeviceListPage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-   const {
-      data: devices,
-      isLoading,
-      error,
-    } = useQuery({
-      queryKey: ["devices", currentPage, pageSize],
-      queryFn: () => getAllDevices(currentPage, pageSize),
-      staleTime: 0,
-      refetchOnMount: "always",
-    });
+  const {
+    data: devices,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["devices", currentPage, pageSize],
+    queryFn: () => getAllDevices(currentPage, pageSize),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
   console.log(devices)
-   
+
 
   // const { data: teams = [] } = useQuery({
   //   queryKey: ['teams-for-device-form'],
@@ -72,7 +72,25 @@ export const DeviceListPage = () => {
   //   onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['devices'] }); toast.success('Device deleted successfully'); setDeleteOpen(false); },
   //   onError: () => toast.error('Failed to delete device'),
   // });
+  const deleteMutation = useMutation({
+    mutationFn: deleteDevice,
 
+    onSuccess: async () => {
+      toast.success("Device deleted successfully");
+
+      // Delay to allow the Kafka event to propagate from the user-management
+      // service to the query service before refetching the device list.
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      await queryClient.invalidateQueries({
+        queryKey: ["devices"],
+      });
+    },
+
+    onError: () => {
+      toast.error("Failed to delete device");
+    },
+  });
   const handleCreate = () => { setSelectedDevice(null); onOpen(); };
   const handleEdit = (device: Device) => { setSelectedDevice(device); setFormOpen(true); };
   const handleDelete = (device: Device) => { setSelectedDevice(device); setDeleteOpen(true); };
@@ -92,10 +110,10 @@ export const DeviceListPage = () => {
   };
 
   const columns: ColumnDef<Device>[] = [
-   
+
     { accessorKey: 'deviceName', header: 'Name' },
-    {accessorKey: 'hostname', header: 'Hostname' }, 
-    {accessorKey: 'ipAddress', header: 'IP Address' }, 
+    { accessorKey: 'hostname', header: 'Hostname' },
+    { accessorKey: 'ipAddress', header: 'IP Address' },
     {
       accessorKey: 'status',
       header: 'Status',
@@ -113,32 +131,103 @@ export const DeviceListPage = () => {
         return new Date(value).toLocaleString();
       },
     },
-    // {
-    //   id: 'actions',
-    //   header: 'Actions',
-    //   cell: ({ row }) => (
-    //     <div className="flex gap-1">
-    //       <Button size="sm" variant="ghost" onClick={() => navigate(`/devices/${row.original.id}`)}><Eye className="h-4 w-4" /></Button>
-    //       <Button size="sm" variant="ghost" onClick={() => handleEdit(row.original)}><Pencil className="h-4 w-4" /></Button>
-    //       <Button size="sm" variant="ghost" onClick={() => navigate(`/devices/${row.original.id}/commands`)}><Terminal className="h-4 w-4" /></Button>
-    //       <AlertDialog >
-    //           <AlertDialogTrigger render={<Button variant="outline"><Trash2 className="h-4 w-4 text-destructive" /></Button>} />
-    //           <AlertDialogContent>
-    //             <AlertDialogHeader>
-    //               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-    //               <AlertDialogDescription>
-    //                 This action cannot be undone. This will permanently delete the tenant.
-    //               </AlertDialogDescription>
-    //             </AlertDialogHeader>
-    //             <AlertDialogFooter>
-    //               <AlertDialogCancel>Cancel</AlertDialogCancel>
-    //               <AlertDialogAction onClick={() => handleDelete(row.original)}>Continue</AlertDialogAction>
-    //             </AlertDialogFooter>
-    //           </AlertDialogContent>
-    //         </AlertDialog>
-    //     </div>
-    //   ),
-    // },
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => {
+        const device = row.original;
+        return (
+          <div className="flex gap-1">
+
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() =>
+                navigate(`/devices/${device.id}`)
+              }
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  // setId(device.id);
+                  // onUpdateOpen()
+                }}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+
+
+              <AlertDialog>
+
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="hover:bg-destructive/10"
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </AlertDialogTrigger>
+
+
+                <AlertDialogContent>
+
+                  <AlertDialogHeader>
+
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+
+                    <AlertDialogDescription>
+                      This will permanently delete{" "}
+                      <span className="font-semibold">
+                        {device.name}
+                      </span>.
+                    </AlertDialogDescription>
+
+                  </AlertDialogHeader>
+
+
+                  <AlertDialogFooter>
+
+                    <AlertDialogCancel
+                      disabled={deleteMutation.isPending}
+                    >
+                      Cancel
+                    </AlertDialogCancel>
+
+
+                    <AlertDialogAction
+                      disabled={deleteMutation.isPending}
+                      className="bg-destructive"
+                      onClick={() =>
+                        deleteMutation.mutate(device.id)
+                      }
+                    >
+                      {deleteMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Delete"
+                      )}
+                    </AlertDialogAction>
+
+
+                  </AlertDialogFooter>
+
+                </AlertDialogContent>
+
+              </AlertDialog>
+            </>
+
+
+          </div>
+        );
+      },
+    },
   ];
 
   // if (isLoading) return <div className="flex h-96 w-full items-center justify-center"><Spinner className="h-8 w-8" /></div>;

@@ -35,7 +35,7 @@ export interface User {
   username: string;
   status: string;
   role: Role;
-  
+
   team: Team;
   teamId?: string;
   roleId?: string;
@@ -76,12 +76,12 @@ export interface Team {
   tenantId: string;
   teamLeaderId?: string;
   teamLeaderName?: string;
-  
+
   deviceCount: number;
   userNumber: number;
   createdAt: string;
   tenantName?: string;
-  
+
 }
 
 // Tenant types
@@ -94,7 +94,7 @@ export interface Tenant {
   teamNumber: number;
 
   alertNumber: number;
-  
+
   email: string;
   phone?: string;
   createdAt: string;
@@ -125,6 +125,25 @@ export interface Device {
   lastSeen: string;
   createdAt: string;
   updatedAt: string;
+
+
+
+}
+
+export interface createDeviceDto {
+
+  deviceName: string
+  teamId: string
+  assignedUserId: string
+  firmwareVersion: string
+  tenantId: string
+  model: string
+  manufacturer: string
+  hostname: string
+  ipAddress: string
+  macAddress: string
+  location: string
+  status: string
 }
 
 export interface DeviceMetrics {
