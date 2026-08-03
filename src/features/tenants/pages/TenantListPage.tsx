@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { getAllTenants, createTenant, updateTenant, deleteTenant } from '@/services/tenantAction';
 import useAddTenantModal from '@/hooks/useAddTenantModal';
+import useUpdateTeanntModal from '@/hooks/useUpdateTeanntModal';
 
 export const TenantListPage = () => {
   const navigate = useNavigate();
@@ -57,15 +58,15 @@ export const TenantListPage = () => {
     onError: () => toast.error('Failed to create tenant'),
   });
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Tenant> }) => updateTenant(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
-      toast.success('Tenant updated successfully');
-      setFormOpen(false);
-    },
-    onError: () => toast.error('Failed to update tenant'),
-  });
+  // const updateMutation = useMutation({
+  //   mutationFn: ({ id, data }: { id: string; data: Partial<Tenant> }) => updateTenant(id, data),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['tenants'] });
+  //     toast.success('Tenant updated successfully');
+  //     setFormOpen(false);
+  //   },
+  //   onError: () => toast.error('Failed to update tenant'),
+  // });
 
   const deleteMutation = useMutation({
     mutationFn: deleteTenant,
@@ -86,6 +87,7 @@ export const TenantListPage = () => {
     setFormOpen(true);
   };
 
+  const {setId,onOpen:onUpdateOpen}=useUpdateTeanntModal()
   const columns: ColumnDef<Tenant>[] = [
     { accessorKey: 'name', header: 'Tenant Name' },
     { accessorKey: 'email', header: 'Email' },
@@ -112,9 +114,9 @@ export const TenantListPage = () => {
             <Button size="sm" variant="ghost" onClick={() => navigate(`/tenants/${tenant.id}`)}>
               <Eye className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => handleEdit(tenant)}>
+            {/* <Button size="sm" variant="ghost" onClick={() => handleEdit(tenant)}>
               <Pencil className="h-4 w-4" />
-            </Button>
+            </Button> */}
 
 
             <>
@@ -122,8 +124,8 @@ export const TenantListPage = () => {
                 size="sm"
                 variant="ghost"
                 onClick={() => {
-                  // setId(role.id);
-                  // onUpdateOpen()
+                   setId(tenant.id);
+                   onUpdateOpen()
                 }}
               >
                 <Pencil className="h-4 w-4" />

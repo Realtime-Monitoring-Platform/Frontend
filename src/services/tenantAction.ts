@@ -28,10 +28,20 @@ interface CreateTenantDto {
     email: string;
     phone?: string;
     companyName?: string;
-    status?: 'ACTIVE' | 'INACTIVE';
-    adminId?: string;
+    status?: string;
+    adminId?:string;
 }
 
+// interface CreateTenantResponse {
+//     id: string;
+//     name: string;
+//     email: string;
+//     phone?: string;
+//     companyName?: string;
+//     status: 'ACTIVE' | 'INACTIVE';
+//     adminId?: string;
+
+// }
 export const createTenant = async (data: CreateTenantDto): Promise<Tenant> => {
     try {
         const response = await api.post('/tenants', data);
@@ -43,13 +53,15 @@ export const createTenant = async (data: CreateTenantDto): Promise<Tenant> => {
 
 export const getTenantById = async (id: string): Promise<Tenant> => {
     try {
-        const response = await api.get(`/tenants/${id}`);
+        const response = await api.get(`/query/tenants/${id}`);
         return response.data;
     } catch (error) {
         throw new Error('Failed to fetch user');
     }   }
 
-export const updateTenant = async (id: string, data: Partial<Tenant>): Promise<Tenant> => {
+
+
+export const updateTenant = async (id: string, data: CreateTenantDto): Promise<Tenant> => {
     try {
         const response = await api.put(`/tenants/${id}`, data);
         return response.data;

@@ -9,6 +9,7 @@ import AddDeviceModal from "./AddDeviceModal";
 import UpdateUserModal from "./UpdateUserModal";
 import UpdateRoleModal from "./UpdateRoleModal";
 import UpdateTeamModal from "./UpdateTeamModal";
+import UpdateTenantModal from "./UpdateTenantModal";
 
 const ModalProviders = () => {
   return (
@@ -17,6 +18,7 @@ const ModalProviders = () => {
       <AddRoleModal />
       <AddTeamModal />
       <AddTenantModal />
+      <UpdateTenantModal/>
       <AddPermissionModal />
       <AddDeviceModal />
       <UpdateUserModal/>

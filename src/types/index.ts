@@ -100,7 +100,7 @@ export interface Tenant {
   createdAt: string;
   updatedAt: string;
   companyName: string,
-  adminId: string
+  AdminId: string
 
 }
 
