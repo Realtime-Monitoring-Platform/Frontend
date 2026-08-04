@@ -21,7 +21,7 @@ export const createDevice = async (data: Partial<createDeviceDto>): Promise<Devi
 
 export const getDeviceById = async (id: string): Promise<Device> => {
     try {
-        const response = await api.get(`/devices/${id}`);
+        const response = await api.get(`/query/devices/${id}`);
         return response.data;
     } catch (error) {
         throw new Error('Failed to fetch device');

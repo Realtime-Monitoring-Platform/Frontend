@@ -5,8 +5,6 @@ import { Download, RefreshCw, Plus, Pencil, Trash2, Eye, Terminal, Loader2 } fro
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DataTable } from '@/components/data-table';
 import { Badge } from '@/components/ui/badge';
 
@@ -25,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import useAddDeviceModal from '@/hooks/useAddDeviceModal';
 import { deleteDevice, getAllDevices } from '@/services/deviceAction';
+import useUpdateDeviceModal from '@/hooks/useUpdateDeviceModal';
 
 export const DeviceListPage = () => {
   const navigate = useNavigate();
@@ -37,7 +36,7 @@ export const DeviceListPage = () => {
 
   const {
     data: devices,
-    isLoading,
+      isLoading,
     error,
   } = useQuery({
     queryKey: ["devices", currentPage, pageSize],
@@ -48,30 +47,10 @@ export const DeviceListPage = () => {
   console.log(devices)
 
 
-  // const { data: teams = [] } = useQuery({
-  //   queryKey: ['teams-for-device-form'],
-  //   queryFn: () => mockTeamApi.list(0, 50).then(res => res.content),
-  // });
 
   const { onOpen } = useAddDeviceModal();
 
-  // const createMutation = useMutation({
-  //   mutationFn: (data: Partial<Device>) => mockDeviceApi.create(data),
-  //   onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['devices'] }); toast.success('Device created successfully'); setFormOpen(false); },
-  //   onError: () => toast.error('Failed to create device'),
-  // });
-
-  // const updateMutation = useMutation({
-  //   mutationFn: ({ id, data }: { id: string; data: Partial<Device> }) => mockDeviceApi.update(id, data),
-  //   onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['devices'] }); toast.success('Device updated successfully'); setFormOpen(false); },
-  //   onError: () => toast.error('Failed to update device'),
-  // });
-
-  // const deleteMutation = useMutation({
-  //   mutationFn: (id: string) => mockDeviceApi.delete(id),
-  //   onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['devices'] }); toast.success('Device deleted successfully'); setDeleteOpen(false); },
-  //   onError: () => toast.error('Failed to delete device'),
-  // });
+ 
   const deleteMutation = useMutation({
     mutationFn: deleteDevice,
 
@@ -92,9 +71,7 @@ export const DeviceListPage = () => {
     },
   });
   const handleCreate = () => { setSelectedDevice(null); onOpen(); };
-  const handleEdit = (device: Device) => { setSelectedDevice(device); setFormOpen(true); };
-  const handleDelete = (device: Device) => { setSelectedDevice(device); setDeleteOpen(true); };
-  // const handleSubmit = (data: Partial<Device>) => {
+   // const handleSubmit = (data: Partial<Device>) => {
   //   if (selectedDevice) updateMutation.mutate({ id: selectedDevice.id, data });
   //   else createMutation.mutate(data);
   // };
@@ -108,6 +85,8 @@ export const DeviceListPage = () => {
       default: return 'default';
     }
   };
+
+  const {setId,onOpen:onUpdateOpen}=useUpdateDeviceModal()
 
   const columns: ColumnDef<Device>[] = [
 
@@ -153,8 +132,8 @@ export const DeviceListPage = () => {
                 size="sm"
                 variant="ghost"
                 onClick={() => {
-                  // setId(device.id);
-                  // onUpdateOpen()
+                   setId(device.id);
+                   onUpdateOpen()
                 }}
               >
                 <Pencil className="h-4 w-4" />
@@ -185,7 +164,7 @@ export const DeviceListPage = () => {
                     <AlertDialogDescription>
                       This will permanently delete{" "}
                       <span className="font-semibold">
-                        {device.name}
+                        {device.deviceName}
                       </span>.
                     </AlertDialogDescription>
 

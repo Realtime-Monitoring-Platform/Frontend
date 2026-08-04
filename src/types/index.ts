@@ -111,20 +111,18 @@ export interface Tenant {
 // Device types
 export interface Device {
   id: string;
-  name: string;
-  deviceId: string;
-  type: DeviceType;
-  ipAddress?: string;
-  status: DeviceStatus;
-  location: string;
-  teamId: string;
-  teamName?: string;
-  description?: string;
-  firmwareVersion: string;
-  metadata?: Record<string, any>;
-  lastSeen: string;
-  createdAt: string;
-  updatedAt: string;
+  deviceName: string
+  teamId: string
+  assignedUserId: string
+  firmwareVersion: string
+  tenantId: string
+  model: string
+  manufacturer: string
+  hostname: string
+  ipAddress: string
+  macAddress: string
+  location: string
+  status: string
 
 
 
