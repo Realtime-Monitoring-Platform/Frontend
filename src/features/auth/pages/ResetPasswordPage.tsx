@@ -43,10 +43,12 @@ export const ResetPasswordPage = () => {
         setError('Invalid or expired reset token');
         return;
       }
-
+      console.log('Submitting reset password form with data:', data);
+      console.log('Reset token:', token);
       await api.post('/auth/reset-password', {
         token,
         newPassword: data.newPassword,
+        confirmationPassword: data.confirmPassword
       });
 
       toast.success('Password reset successfully');

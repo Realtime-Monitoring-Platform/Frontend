@@ -9,7 +9,7 @@ import { useAuth } from '../../../hooks/useAuth';
 
 export const ProfilePage = () => {
   const { user } = useAuth();
-
+  console.log("user data", user);
   if (!user) {
     return (
       <div className="flex h-96 w-full items-center justify-center">
@@ -31,15 +31,15 @@ export const ProfilePage = () => {
           <CardContent className="pt-6 text-center">
             <Avatar className="mx-auto mb-4 h-24 w-24">
               <AvatarFallback className="bg-primary text-4xl text-primary-foreground">
-                {user.firstName[0]}
-                {user.lastName[0]}
+                {user.firstName}
+                {user.lastName}
               </AvatarFallback>
             </Avatar>
             <h2 className="text-xl font-semibold">
               {user.firstName} {user.lastName}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {user.roles[0]?.name.replace('ROLE_', '')}
+              {user.roleName || "User"}
             </p>
             <p className="text-xs text-muted-foreground">
               Member since {new Date(user.createdAt).toLocaleDateString()}

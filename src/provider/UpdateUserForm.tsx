@@ -31,6 +31,7 @@ import { getTenantList } from "@/services/tenantAction";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useUpdateUserModal from "@/hooks/useUpdateUserModal";
 import { Tenant } from "@/types";
+import { Spinner } from "@/components/ui/spinner";
 
 // 1. Interfaces for DB records
 interface RoleOption {
@@ -80,7 +81,7 @@ const UpdateUserForm = () => {
     const { data: tenants = [], isLoading: isTenantsLoading } = useQuery({
         queryKey: ["tenants"],
         queryFn: getTenantList,
-    });
+    }); 
 
     const {
         data: userData,
@@ -108,9 +109,9 @@ const UpdateUserForm = () => {
             firstName: "",
             lastName: "",
             status: "ACTIVE",
-            roleId: "",
-            teamId: "",
-            tenantId: "",
+            roleId: userData?.roleId ? String(userData.roleId) : "",
+            teamId: userData?.teamId ? String(userData.teamId) : "",
+            tenantId: userData?.tenantId ? String(userData.tenantId) : "",
         },
     });
 
@@ -153,6 +154,10 @@ const UpdateUserForm = () => {
     const onSubmit = (values: FormValues) => {
         updateUserMutation.mutate(values);
     };
+
+    if(isUserLoading || isRolesLoading || isTeamsLoading || isTenantsLoading) { 
+        return <Spinner className="mx-auto my-8 h-8 w-8 text-primary" />;
+    }
 
     return (
         <Form {...form} >

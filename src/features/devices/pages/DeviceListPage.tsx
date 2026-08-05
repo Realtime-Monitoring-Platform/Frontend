@@ -36,7 +36,7 @@ export const DeviceListPage = () => {
 
   const {
     data: devices,
-      isLoading,
+    isLoading,
     error,
   } = useQuery({
     queryKey: ["devices", currentPage, pageSize],
@@ -50,7 +50,6 @@ export const DeviceListPage = () => {
 
   const { onOpen } = useAddDeviceModal();
 
- 
   const deleteMutation = useMutation({
     mutationFn: deleteDevice,
 
@@ -71,7 +70,7 @@ export const DeviceListPage = () => {
     },
   });
   const handleCreate = () => { setSelectedDevice(null); onOpen(); };
-   // const handleSubmit = (data: Partial<Device>) => {
+  // const handleSubmit = (data: Partial<Device>) => {
   //   if (selectedDevice) updateMutation.mutate({ id: selectedDevice.id, data });
   //   else createMutation.mutate(data);
   // };
@@ -86,7 +85,7 @@ export const DeviceListPage = () => {
     }
   };
 
-  const {setId,onOpen:onUpdateOpen}=useUpdateDeviceModal()
+  const { setId, onOpen: onUpdateOpen } = useUpdateDeviceModal()
 
   const columns: ColumnDef<Device>[] = [
 
@@ -132,8 +131,8 @@ export const DeviceListPage = () => {
                 size="sm"
                 variant="ghost"
                 onClick={() => {
-                   setId(device.id);
-                   onUpdateOpen()
+                  setId(device.id);
+                  onUpdateOpen()
                 }}
               >
                 <Pencil className="h-4 w-4" />

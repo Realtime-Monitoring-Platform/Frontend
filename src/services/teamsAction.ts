@@ -17,6 +17,7 @@ export const getAllTeams = async (page = 0, size = 10): Promise<Pagination<Team>
 export const createTeam = async (data: Partial<Team>): Promise<Team> => {
     try {
         console.log("Creating team:////////////", data);
+        console.log("Creating team:////////////", data);
         const response = await api.post('/teams', data);
         console.log("Created team::::::::::::::::::", response.data);
         return response.data;

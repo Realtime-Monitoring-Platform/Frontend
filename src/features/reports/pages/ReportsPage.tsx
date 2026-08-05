@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DataTable } from '@/components/data-table';
 import { api } from '../../../services/api';
 import { mockReports } from '@/services/mockData';
+import { useAuth } from '@/hooks/useAuth';
 
 type Report = {
   id: string;
@@ -21,7 +22,10 @@ type Report = {
 
 export const ReportsPage = () => {
   
-
+  const {hasPermission} =useAuth();
+  const canUpdate=hasPermission('REPORT_UPDATE');
+  const canDelete=hasPermission('REPORT_DELETE');
+  const canCreate=hasPermission('REPORT_CREATE');
   const getFormatIcon = (format: string) => {
     switch (format) {
       case 'PDF': return <FileText className="h-4 w-4" />;

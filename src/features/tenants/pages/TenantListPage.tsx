@@ -25,6 +25,7 @@ import {
 import { getAllTenants, createTenant, updateTenant, deleteTenant } from '@/services/tenantAction';
 import useAddTenantModal from '@/hooks/useAddTenantModal';
 import useUpdateTeanntModal from '@/hooks/useUpdateTeanntModal';
+import { useAuth } from '@/hooks/useAuth';
 
 export const TenantListPage = () => {
   const navigate = useNavigate();
@@ -76,7 +77,10 @@ export const TenantListPage = () => {
     },
     onError: () => toast.error('Failed to delete tenant'),
   });
-
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission('TENANT_CREATE');
+  const canUpdate = hasPermission('TENANT_UPDATE');
+  const canDelete = hasPermission('TENANT_DELETE');
   const handleCreate = () => {
     setSelectedTenant(null);
     onOpen();
@@ -87,7 +91,7 @@ export const TenantListPage = () => {
     setFormOpen(true);
   };
 
-  const {setId,onOpen:onUpdateOpen}=useUpdateTeanntModal()
+  const { setId, onOpen: onUpdateOpen } = useUpdateTeanntModal()
   const columns: ColumnDef<Tenant>[] = [
     { accessorKey: 'name', header: 'Tenant Name' },
     { accessorKey: 'email', header: 'Email' },
@@ -123,9 +127,10 @@ export const TenantListPage = () => {
               <Button
                 size="sm"
                 variant="ghost"
+                disabled={!canUpdate}
                 onClick={() => {
-                   setId(tenant.id);
-                   onUpdateOpen()
+                  setId(tenant.id);
+                  onUpdateOpen()
                 }}
               >
                 <Pencil className="h-4 w-4" />
@@ -138,6 +143,7 @@ export const TenantListPage = () => {
                   <Button
                     size="sm"
                     variant="ghost"
+                    disabled={!canDelete}
                     className="hover:bg-destructive/10"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -203,7 +209,7 @@ export const TenantListPage = () => {
           <h1 className="text-3xl font-bold">Tenants</h1>
           <p className="text-sm text-muted-foreground">Manage platform tenants</p>
         </div>
-        <Button onClick={handleCreate}><Plus className="mr-2 h-4 w-4" />Add Tenant</Button>
+        <Button disabled={!canCreate} onClick={handleCreate}><Plus className="mr-2 h-4 w-4" />Add Tenant</Button>
       </div>
 
       <Card>

@@ -34,12 +34,13 @@ export interface User {
   email: string;
   username: string;
   status: string;
-  role: Role;
-
+  role: Role | string;
+  permissions?: string[];
   team: Team;
   teamId?: string;
   roleId?: string;
   roleName?: string;
+  
   tenantId?: string;
   tenantName?: string;
   lastLogin?: string;
@@ -291,6 +292,7 @@ export interface LoginRequest {
 export interface LoginResponse {
   access_token: string;
   refresh_token: string;
+  first_login?: boolean;
   expiresIn: number;
   user: User;
 }
@@ -302,6 +304,12 @@ export interface ForgotPasswordRequest {
 export interface ResetPasswordRequest {
   token: string;
   newPassword: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmationPassword: string;
 }
 
 export interface ActivateAccountRequest {

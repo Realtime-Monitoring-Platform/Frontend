@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { getAllUsers, getUsersList } from '@/services/usersAction';
 import useUpdateTeamsModal from '@/hooks/useUpdateTeamsModal';
+import { useAuth } from '@/hooks/useAuth';
 export const TeamListPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -90,7 +91,10 @@ export const TeamListPage = () => {
     refetchOnMount: "always",
   });
 
-
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission('TEAM_CREATE');
+  const canUpdate = hasPermission('TEAM_UPDATE');
+  const canDelete = hasPermission('TEAM_DELETE');
   const deleteMutation = useMutation({
     mutationFn: deleteTeam,
 
@@ -150,6 +154,7 @@ export const TeamListPage = () => {
                   setId(role.id);
                   openUpdateTeamModal();
                 }}
+                disabled={!canUpdate}
               >
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -162,6 +167,7 @@ export const TeamListPage = () => {
                     size="sm"
                     variant="ghost"
                     className="hover:bg-destructive/10"
+                    disabled={!canDelete}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
@@ -234,7 +240,9 @@ export const TeamListPage = () => {
           <h1 className="text-3xl font-bold">Teams</h1>
           <p className="text-sm text-muted-foreground">Manage teams and assignments</p>
         </div>
-        <Button onClick={onOpen}><Plus className="mr-2 h-4 w-4" />Add Team</Button>
+        <Button disabled={!canCreate} onClick={onOpen}>
+          <Plus className="mr-2 h-4 w-4" />Add Team
+        </Button>
       </div>
 
       <Card>

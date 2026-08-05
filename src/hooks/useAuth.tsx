@@ -8,8 +8,10 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: LoginRequest) => Promise<void>;
+  isFirstLogin: boolean;
+  login: (credentials: LoginRequest) => Promise<boolean>;
   logout: () => void;
+  completeFirstLogin: () => void;
   hasRole: (role: string) => boolean;
   hasPermission: (permission: string) => boolean;
 }
@@ -19,19 +21,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [cookies, setCookie, removeCookie] = useCookies(['refresh_Token', 'access_Token']);
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
+  const [, setCookie] = useCookies(['refresh_Token', 'access_token']);
 
 
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem('access_token');
       if (token) {
         try {
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           const response = await api.get('/auth/me');
+          console.log('Fetched user data:', response.data);
           setUser(response.data);
         } catch {
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
+         // localStorage.removeItem('access_token');
+          //localStorage.removeItem('refresh_token');
         }
       }
       setIsLoading(false);
@@ -46,66 +51,54 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: credentials.email,
         password: credentials.password,
       });
-      const { access_token, refresh_token } = response.data;
+      const { access_token, refresh_token, first_login } = response.data;
       console.log('Login successful:', response.data);
-      //cookieStore.setItem('accessToken', access_token);
-      setCookie('access_Token', access_token, { path: '/' });
+      setCookie('access_token', access_token, { path: '/' });
       setCookie('refresh_Token', refresh_token, { path: '/' });
-      localStorage.setItem('refreshToken', refresh_token);
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
 
-      // Fetch user info after login
-      // try {
-      //   const userResponse = await api.get('/auth/me');
-      //   setUser(userResponse.data);
-      // } catch {
-      //   // If /auth/me doesn't exist, create a basic user from the login response
-      //   setUser({
-      //     id: '',
-      //     username: credentials.email,
-      //     email: credentials.email,
-      //     firstName: credentials.email,
-      //     lastName: '',
-      //     status: 'ACTIVE',
-      //     roles: [],
-      //     teams: [],
-      //     createdAt: new Date().toISOString(),
-      //     updatedAt: new Date().toISOString(),
-      //     mustChangePassword: false,
-      //   } as User);
-      // }
+      setIsFirstLogin(first_login === true);
 
       toast.success(`Welcome back!`);
+      return first_login === true;
     } catch (error) {
       toast.error('Login failed. Please check your credentials.');
       throw error;
     }
   };
 
+  const completeFirstLogin = () => {
+    setIsFirstLogin(false);
+  };
+
   const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     setUser(null);
+    setIsFirstLogin(false);
     toast.success('Logged out successfully');
   };
 
   const hasRole = (role: string): boolean => {
     if (!user) return false;
-    return user.roles.some((r) => r.name === role);
+    const roleName = typeof user.role === 'string' ? user.role : user.role?.name;
+    return roleName === role;
   };
 
   const hasPermission = (permission: string): boolean => {
     if (!user) return false;
-    return user.roles.some((role) =>
-      role.permissions.some((p) => p.name === permission)
-    );
+    return (user.permissions ?? []).includes(permission);
   };
 
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
     isLoading,
+    isFirstLogin,
     login,
     logout,
+    completeFirstLogin,
     hasRole,
     hasPermission,
   };

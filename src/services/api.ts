@@ -9,9 +9,11 @@ class ApiService {
   constructor() {
     this.client = axios.create({
       baseURL: API_BASE_URL,
+      //authorization: `Bearer ${localStorage.getItem('access_token')}`,
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
       },
     });
 
@@ -22,7 +24,8 @@ class ApiService {
     // Request interceptor to add auth token
     this.client.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem('access_token');
+        console.log('Request interceptor - Authorization header:', token);
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -39,23 +42,23 @@ class ApiService {
 
         if (error.response?.status === 401 && originalRequest) {
           // Token expired, try to refresh
-          const refreshToken = localStorage.getItem('refreshToken');
-          if (refreshToken) {
+          const refresh_Token = localStorage.getItem('refresh_Token');
+          if (refresh_Token) {
             try {
-              
+
               const response = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {
-                refreshToken,
+                refresh_Token,
               });
-              const { accessToken } = response.data;
-              localStorage.setItem('accessToken', accessToken);
+              const { access_token } = response.data;
+              localStorage.setItem('access_token', access_token);
               if (originalRequest.headers) {
-                originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+                originalRequest.headers.Authorization = `Bearer ${access_token}`;
               }
               return this.client(originalRequest);
             } catch {
               // Refresh failed, redirect to login
-              localStorage.removeItem('accessToken');
-              localStorage.removeItem('refreshToken');
+           //   localStorage.removeItem('access_token');
+             // localStorage.removeItem('refresh_Token');
               window.location.href = '/auth/authenticate';
             }
           } else {

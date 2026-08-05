@@ -37,8 +37,12 @@ export const LoginPage = () => {
     try {
       setError(null);
       console.log(data);
-      await login(data);
-      navigate('/');
+      const isFirstLogin = await login(data);
+      if (isFirstLogin) {
+        navigate('/auth/change-password');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError('Invalid username or password');
     }

@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronUp,
   ChevronDown,
+  Group,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -22,7 +23,8 @@ interface SidebarItem {
   label: string;
   icon: React.ReactNode;
   path?: string;
-  roles: UserRole[];
+  permission?: string;
+  roles?: UserRole[];
   children?: SidebarItem[];
 }
 
@@ -31,55 +33,61 @@ const sidebarItems: SidebarItem[] = [
     label: 'Dashboard',
     icon: <LayoutDashboard className="h-5 w-5" />,
     path: '/dashboard',
-    roles: ['PLATFORM_ADMIN', 'TENANT_ADMIN', 'EMBEDDED_ENGINEER', 'OPERATOR', 'VIEWER'],
+    permission: 'SYSTEM_CONFIG_UPDATE',
   },
   {
     label: 'Tenants',
     icon: <Building className="h-5 w-5" />,
     path: '/tenants',
-    roles: ['PLATFORM_ADMIN'],
+    permission: 'TENANT_READ',
   },
   {
     label: 'Users',
     icon: <Users className="h-5 w-5" />,
     path: '/users',
-    roles: ['PLATFORM_ADMIN', 'TENANT_ADMIN'],
+    permission: 'USER_READ',
   },
   {
     label: 'Roles & Permissions',
     icon: <Shield className="h-5 w-5" />,
     path: '/roles',
-    roles: ['PLATFORM_ADMIN'],
+    permission: 'ROLE_READ',
   },
   {
     label: 'Devices',
     icon: <Router className="h-5 w-5" />,
     path: '/devices',
-    roles: ['PLATFORM_ADMIN', 'TENANT_ADMIN', 'EMBEDDED_ENGINEER'],
+    permission: 'DEVICE_READ',
+  },
+  {
+    label: 'Teams',
+    icon: <Group className="h-5 w-5" />,
+    path: '/teams',
+    permission: 'TEAM_READ',
   },
   {
     label: 'Alerts',
     icon: <Bell className="h-5 w-5" />,
     path: '/alerts',
-    roles: ['PLATFORM_ADMIN', 'TENANT_ADMIN', 'EMBEDDED_ENGINEER', 'OPERATOR'],
+    permission: 'ALERT_READ',
   },
   {
     label: 'Monitoring',
     icon: <BarChart3 className="h-5 w-5" />,
     path: '/monitoring',
-    roles: ['OPERATOR', 'EMBEDDED_ENGINEER', 'TENANT_ADMIN', 'VIEWER'],
+    permission: 'MONITORING_READ',
   },
   {
     label: 'Reports',
     icon: <BarChart3 className="h-5 w-5" />,
     path: '/reports',
-    roles: ['PLATFORM_ADMIN', 'TENANT_ADMIN', 'VIEWER'],
+    permission: 'REPORT_READ',
   },
   {
     label: 'Settings',
     icon: <Settings className="h-5 w-5" />,
     path: '/settings',
-    roles: ['PLATFORM_ADMIN', 'TENANT_ADMIN'],
+    permission: 'SYSTEM_CONFIG_UPDATE',
   },
 ];
 
@@ -108,9 +116,15 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
     }
   };
 
-  const filteredItems = sidebarItems.filter((item) =>
-    user?.roles.some((role) => item.roles.includes(role.name as UserRole))
-  );
+  // const filteredItems = sidebarItems.filter((item) =>
+  //   user?.roles.some((role) => item.roles.includes(role.name as UserRole))
+  // );
+
+  const filteredItems = sidebarItems.filter((item)=>{
+    if(user?.permissions?.includes(item.permission ?? '')) {
+      return true;
+    }
+  })
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
@@ -124,11 +138,10 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
           </Button>
         )}
       </div>
-
       <Separator />
 
       <nav className="flex-1 overflow-y-auto p-2">
-        {filteredItems.map((item) => (
+         {filteredItems.map((item) => (
           <div key={item.label}>
             <div
               className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium cursor-pointer transition-colors ${
@@ -177,7 +190,7 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
               </div>
             )}
           </div>
-        ))}
+        ))} 
       </nav>
 
       <Separator />

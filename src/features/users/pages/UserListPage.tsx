@@ -26,6 +26,7 @@ import { getAllUsers, deleteUser } from '@/services/usersAction';
 import useAddUserModal from '@/hooks/useAddUserModal';
 import { useState } from 'react';
 import useUpdateUserModal from '@/hooks/useUpdateUserModal';
+import { useAuth } from '@/hooks/useAuth';
 
 export const UserListPage = () => {
   const navigate = useNavigate();
@@ -37,7 +38,10 @@ export const UserListPage = () => {
   } = useUpdateUserModal();
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-
+  const {user,hasPermission} = useAuth();
+  const canUpdate= hasPermission('USER_UPDATE');
+  const canDelete= hasPermission('USER_DELETE');
+  const canCreate= hasPermission('USER_CREATE');
   const {
     data: users,
     isLoading,
@@ -108,6 +112,7 @@ export const UserListPage = () => {
                 setUpdateId(row.original.id);
                 onUpdateOpen();
               }}
+              disabled={!canUpdate}
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -115,7 +120,7 @@ export const UserListPage = () => {
             {/* FIXED ALERT DIALOG */}
             <AlertDialog>
               <AlertDialogTrigger >
-                <Button size="sm" variant="ghost" className="hover:bg-destructive/10">
+                <Button disabled={!canDelete} size="sm" variant="ghost" className="hover:bg-destructive/10">
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </AlertDialogTrigger>
@@ -182,7 +187,7 @@ export const UserListPage = () => {
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
-          <Button onClick={onOpen}>
+          <Button disabled={!canCreate} onClick={onOpen}>
             <Plus className="mr-2 h-4 w-4" />
             Add User
           </Button>

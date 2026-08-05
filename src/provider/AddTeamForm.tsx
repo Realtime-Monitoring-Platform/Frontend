@@ -40,7 +40,7 @@ const formSchema = z.object({
   name: z.string().min(1, "Team name is required"),
   description: z.string().optional(),
   tenantId: z.string().min(1, "Tenant is required"),
-  leadId: z.string().optional(),
+  teamLeaderId: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -53,7 +53,7 @@ const AddTeamForm = () => {
       name: "",
       description: "",
       tenantId: "",
-      leadId: "",
+      teamLeaderId: "",
     },
   });
   const { onClose } = useAddTeamModal();
@@ -188,10 +188,10 @@ const AddTeamForm = () => {
 
         <FormField
           control={form.control}
-          name="leadId"
+          name="teamLeaderId"
           render={({ field }) => (
             <div className="grid grid-cols-4 items-center gap-4">
-              <FormLabel htmlFor="leadId" className="text-right">
+              <FormLabel htmlFor="teamLeaderId" className="text-right">
                 Team Lead
               </FormLabel>
               <FormControl>

@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import useUpdateRoleModal from "@/hooks/useUpdateRoleModal";
 import useUpdateUserModal from "@/hooks/useUpdateUserModal";
+import { useAuth } from "@/hooks/useAuth";
 
 
 export const RoleListPage = () => {
@@ -52,7 +53,10 @@ export const RoleListPage = () => {
     staleTime: 0,
     refetchOnMount: "always",
   });
-
+  const {hasPermission}=useAuth();
+  const canCreate=hasPermission('ROLE_CREATE');
+  const canUpdate=hasPermission('ROLE_UPDATE');
+  const canDelete=hasPermission('ROLE_DELETE');
 
   const deleteMutation = useMutation({
     mutationFn: deleteRole,
@@ -129,7 +133,7 @@ export const RoleListPage = () => {
             </Button>
 
 
-            {!role.isSystemRole && (
+           
               <>
                 <Button
                   size="sm"
@@ -138,6 +142,7 @@ export const RoleListPage = () => {
                     setId(role.id);
                     onUpdateOpen()
                   }}
+                  disabled={!canUpdate}
                 >
                   <Pencil className="h-4 w-4" />
                 </Button>
@@ -150,6 +155,7 @@ export const RoleListPage = () => {
                       size="sm"
                       variant="ghost"
                       className="hover:bg-destructive/10"
+                      disabled={!canDelete}
                     >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
@@ -183,9 +189,11 @@ export const RoleListPage = () => {
                       </AlertDialogCancel>
 
 
+
                       <AlertDialogAction
                         disabled={deleteMutation.isPending}
                         className="bg-destructive"
+                        
                         onClick={() =>
                           deleteMutation.mutate(role.id)
                         }
@@ -204,7 +212,7 @@ export const RoleListPage = () => {
 
                 </AlertDialog>
               </>
-            )}
+            
 
           </div>
         );
@@ -249,7 +257,7 @@ export const RoleListPage = () => {
         </div>
 
 
-        <Button onClick={onOpen}>
+        <Button disabled={!canCreate} onClick={onOpen}>
           <Plus className="mr-2 h-4 w-4" />
           Add Role
         </Button>
