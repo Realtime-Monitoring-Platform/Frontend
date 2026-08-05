@@ -50,7 +50,6 @@ export const DeviceListPage = () => {
 
   const { onOpen } = useAddDeviceModal();
 
-
   const deleteMutation = useMutation({
     mutationFn: deleteDevice,
 
