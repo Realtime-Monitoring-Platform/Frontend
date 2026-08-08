@@ -101,7 +101,6 @@ const AddDeviceForm = () => {
 
       toast.success("Device created successfully");
 
-
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       await queryClient.invalidateQueries({

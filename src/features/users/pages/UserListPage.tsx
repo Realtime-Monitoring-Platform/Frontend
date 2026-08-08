@@ -28,7 +28,7 @@ import { useState } from 'react';
 import useUpdateUserModal from '@/hooks/useUpdateUserModal';
 import { useAuth } from '@/hooks/useAuth';
 
-export const UserListPage = () => {
+const UserListPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { onOpen } = useAddUserModal();
@@ -235,3 +235,6 @@ export const UserListPage = () => {
     </div>
   );
 };
+
+
+export default UserListPage;

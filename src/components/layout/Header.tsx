@@ -155,7 +155,6 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
           </Tooltip>
         </TooltipProvider>
 
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="ml-1">

@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DataTable } from '@/components/data-table';
-
 import { useAuth } from '@/hooks/useAuth';
 
 type Report = {

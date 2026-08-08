@@ -30,7 +30,6 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import useAddTeamModal from "@/hooks/useAddTeamModal";
 import { getAllTenants } from "@/services/tenantAction";
-
 import { DialogFooter } from "@/components/ui/dialog";
 import { createTeam } from "@/services/teamsAction";
 import { getAllUsers, getUsersList } from "@/services/usersAction";
@@ -59,7 +58,6 @@ const AddTeamForm = () => {
     },
   });
   const { onClose } = useAddTeamModal();
-
   const [tenants, setTenants] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
 
@@ -76,7 +74,6 @@ const AddTeamForm = () => {
     };
     fetchData();
   }, []);
-
 
   const createTeamMutation = useMutation({
     mutationFn: createTeam,

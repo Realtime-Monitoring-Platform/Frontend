@@ -26,7 +26,6 @@ export type ReportFormat = 'PDF' | 'EXCEL' | 'CSV' | 'JSON';
 
 export type ReportType = 'DEVICE_INVENTORY' | 'DEVICE_HEALTH' | 'PERFORMANCE' | 'INCIDENT' | 'AI_ANALYSIS';
 
-
 export interface User {
   id: string;
   firstName: string;
@@ -193,7 +192,6 @@ export interface AlertComment {
   timestamp: string;
 }
 
-
 export interface Command {
   id: string;
   deviceId: string;
@@ -258,7 +256,6 @@ export interface ChartData {
   color?: string;
 }
 
-
 export interface PaginatedResponse<T> {
   content: T[];
   totalElements: number;
@@ -280,7 +277,6 @@ export interface ApiError {
   code: string;
   details?: Record<string, any>;
 }
-
 
 export interface LoginRequest {
   email: string;
@@ -314,7 +310,6 @@ export interface ActivateAccountRequest {
   token: string;
 }
 
-
 export interface Notification {
   id: string;
   type: 'ALERT' | 'COMMAND' | 'DEVICE' | 'SYSTEM' | 'USER';
@@ -346,7 +341,6 @@ export interface AuditLog {
   userAgent: string;
 }
 
-
 export interface Report {
   id: string;
   name: string;
@@ -358,7 +352,6 @@ generatedAt: string;
   downloadUrl: string;
   parameters?: Record<string, any>;
 }
-
 
 export interface SelectOption {
   value: string;

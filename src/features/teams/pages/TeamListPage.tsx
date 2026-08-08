@@ -29,7 +29,7 @@ import {
 import { getAllUsers, getUsersList } from '@/services/usersAction';
 import useUpdateTeamsModal from '@/hooks/useUpdateTeamsModal';
 import { useAuth } from '@/hooks/useAuth';
-export const TeamListPage = () => {
+ const TeamListPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: tenants = [] } = useQuery({
@@ -202,7 +202,6 @@ export const TeamListPage = () => {
 
   if (isLoading) return <div className="flex h-96 w-full items-center justify-center"><Spinner className="h-8 w-8" /></div>;
   if (error) return <Alert variant="destructive"><AlertDescription>Failed to load teams</AlertDescription></Alert>;
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -261,3 +260,5 @@ export const TeamListPage = () => {
     </div>
   );
 };
+
+export default TeamListPage;
