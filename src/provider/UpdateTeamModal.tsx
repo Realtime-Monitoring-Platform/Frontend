@@ -3,7 +3,7 @@ import Modal from "./Modal";
 import UpdateTeamForm from "./UpdateTeamForm";
 
 const UpdateTeamModal = () => {
-    const { isOpen, onOpen, onClose } = useUpdateTeamsModal();
+    const { isOpen,  onClose } = useUpdateTeamsModal();
   return (
     <Modal
       title="Mettre à jour un équipe"

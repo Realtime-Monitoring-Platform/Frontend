@@ -9,7 +9,7 @@ import { Router, Gauge, Network, Thermometer } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '../../../services/api';
 
-export const DeviceDetailsPage = () => {
+ const DeviceDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -212,3 +212,5 @@ export const DeviceDetailsPage = () => {
     </div>
   );
 };
+
+export default DeviceDetailsPage;

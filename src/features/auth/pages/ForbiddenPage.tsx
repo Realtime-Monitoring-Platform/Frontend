@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ShieldAlert } from 'lucide-react';
 
-export const ForbiddenPage = () => {
+ const ForbiddenPage = () => {
   const navigate = useNavigate();
 
   return (
@@ -28,3 +28,5 @@ export const ForbiddenPage = () => {
     </div>
   );
 };
+
+export default ForbiddenPage;

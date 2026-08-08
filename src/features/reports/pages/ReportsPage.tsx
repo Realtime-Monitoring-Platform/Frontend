@@ -18,7 +18,7 @@ type Report = {
   downloadUrl: string;
 };
 
-export const ReportsPage = () => {
+ const ReportsPage = () => {
   
   const {hasPermission} =useAuth();
   const canUpdate=hasPermission('REPORT_UPDATE');
@@ -119,3 +119,6 @@ export const ReportsPage = () => {
     </div>
   );
 };
+
+
+export default ReportsPage;

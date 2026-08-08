@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Bell, Palette, Shield } from 'lucide-react';
 import { useCustomTheme } from '@/styles/ThemeProvider';
 
-export const SettingsPage = () => {
+ const SettingsPage = () => {
   const { mode, toggleTheme } = useCustomTheme();
   const [notifications, setNotifications] = useState(true);
   const [emailAlerts, setEmailAlerts] = useState(true);
@@ -124,3 +124,6 @@ export const SettingsPage = () => {
     </div>
   );
 };
+
+
+export default SettingsPage;

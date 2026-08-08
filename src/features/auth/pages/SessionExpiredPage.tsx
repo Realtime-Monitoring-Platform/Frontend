@@ -5,7 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../../../hooks/useAuth';
 
-export const SessionExpiredPage = () => {
+ const SessionExpiredPage = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
@@ -31,7 +31,7 @@ export const SessionExpiredPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Alert variant="warning">
+          <Alert variant="default">
             <AlertTitle>Session Expired</AlertTitle>
             <AlertDescription>
               Your session has expired. Please sign in again.
@@ -50,3 +50,5 @@ export const SessionExpiredPage = () => {
     </div>
   );
 };
+
+export default SessionExpiredPage;

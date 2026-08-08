@@ -7,7 +7,7 @@ import { Router, Bell, Send, Gauge } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '../../../services/api';
 
-export const EmbeddedEngineerDashboard = () => {
+ const EmbeddedEngineerDashboard = () => {
   const { data: kpisData, isLoading, error } = useQuery({
     queryKey: ['embedded-engineer-dashboard'],
     queryFn: () => api.get('/embedded-engineer/dashboard/kpis').then(res => res.data),
@@ -139,3 +139,5 @@ export const EmbeddedEngineerDashboard = () => {
     </div>
   );
 };
+
+export default EmbeddedEngineerDashboard;

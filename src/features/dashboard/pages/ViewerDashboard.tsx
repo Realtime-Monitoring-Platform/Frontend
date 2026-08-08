@@ -6,7 +6,7 @@ import { Eye } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { api } from '../../../services/api';
 
-export const ViewerDashboard = () => {
+ const ViewerDashboard = () => {
   const { data: kpisData, isLoading, error } = useQuery({
     queryKey: ['viewer-dashboard'],
     queryFn: () => api.get('/viewer/dashboard/kpis').then(res => res.data),
@@ -135,3 +135,6 @@ export const ViewerDashboard = () => {
     </div>
   );
 };
+
+
+export default ViewerDashboard;

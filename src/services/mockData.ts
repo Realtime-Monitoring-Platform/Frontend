@@ -74,6 +74,8 @@ const deviceTypes = ['SENSOR', 'GATEWAY', 'CONTROLLER', 'SENSOR_ARRAY', 'ACTUATO
 const deviceStatuses = ['ONLINE', 'OFFLINE', 'WARNING', 'ERROR'] as const;
 const locations = ['Building A - Floor 1', 'Building A - Floor 2', 'Building B - Floor 1', 'Server Room', 'Warehouse', 'Outdoor North', 'Outdoor South', 'Lab Room 101', 'Lab Room 102', 'Data Center'];
 
+
+
 export const mockDevices: Device[] = Array.from({ length: 30 }, (_, i) => {
   const type = deviceTypes[i % deviceTypes.length];
   const status = i < 20 ? 'ONLINE' : i < 25 ? 'WARNING' : i < 28 ? 'OFFLINE' : 'ERROR';
@@ -93,6 +95,13 @@ export const mockDevices: Device[] = Array.from({ length: 30 }, (_, i) => {
     lastSeen: status === 'OFFLINE' ? iso(rand(1, 5)) : iso(0, rand(0, 3)),
     createdAt: iso(rand(10, 90)),
     updatedAt: iso(rand(0, 5)),
+    assignedUserId: pick(mockUsers).id,
+    deviceName: `${type.charAt(0) + type.slice(1).toLowerCase()} ${String(i + 1).padStart(3, '0')}`,
+    hostname: `device-${i + 1}.example.com`,
+    macAddress: `00:1A:C2:9B:${String(i + 1).padStart(2, '0')}:FF`,
+    manufacturer: pick(['Siemens', 'Schneider', 'ABB', 'Honeywell']),
+    model: `Model-${i + 1}`,
+    tenantId: 'tenant1',
   };
 });
 
@@ -153,7 +162,7 @@ export const mockAlerts: Alert[] = Array.from({ length: 20 }, (_, i) => {
     severity: severity as Alert['severity'],
     status: status as Alert['status'],
     deviceId: device.id,
-    deviceName: device.name,
+    deviceName: device.deviceName,
     deviceLocation: device.location,
     message: alertMessages[i % alertMessages.length],
     timestamp: iso(rand(0, 10), rand(0, 23)),
@@ -180,7 +189,7 @@ export const mockCommands: Command[] = Array.from({ length: 15 }, (_, i) => {
   return {
     id: `cmd${i + 1}`,
     deviceId: device.id,
-    deviceName: device.name,
+    deviceName: device.deviceName,
     commandType: pick(['RESTART_SERVICE', 'CLEAR_CACHE', 'UPDATE_CONFIG', 'RUN_DIAGNOSTIC', 'CUSTOM', 'FIRMWARE_UPDATE'] as const),
     parameters: { timeout: 30, force: i % 2 === 0 },
     status: status as Command['status'],
@@ -248,11 +257,7 @@ export const mockReports: Report[] = Array.from({ length: 12 }, (_, i) => ({
 
 // ─── Notifications ────────────────────────────────────────────────────────────
 export const mockNotifications: Notification[] = [
-  { id: 'n1', type: 'ALERT', title: 'Critical Alert: Device XYZ', message: 'CPU temperature exceeds 90°C', read: false, timestamp: iso(0, 0), link: '/alerts' },
-  { id: 'n2', type: 'COMMAND', title: 'Command Completed', message: 'Restart service on Device ABC', read: false, timestamp: iso(0, 0), link: '/devices' },
-  { id: 'n3', type: 'DEVICE', title: 'Device Offline', message: 'Sensor Array A1 is offline', read: false, timestamp: iso(0, 1), link: '/devices' },
-  { id: 'n4', type: 'SYSTEM', title: 'System Update', message: 'Platform updated to v2.5.0', read: true, timestamp: iso(1), link: '/settings' },
-  { id: 'n5', type: 'USER', title: 'New User Added', message: 'Kevin Martinez joined Global Industries', read: true, timestamp: iso(5), link: '/users' },
+
 ];
 
 // ─── Dashboard Chart Data ─────────────────────────────────────────────────────

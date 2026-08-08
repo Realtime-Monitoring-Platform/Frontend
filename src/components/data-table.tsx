@@ -67,6 +67,9 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  
+  // Unique ID for connecting the search input with its hidden label
+  const generatedId = React.useId();
 
   const table = useReactTable({
     data,
@@ -119,8 +122,13 @@ export function DataTable<TData, TValue>({
   return (
     <div className="w-full">
       {searchKey && (
-        <div className="flex items-center py-4">
+        <div className="flex flex-col gap-1 py-4">
+          {/* FIXED: Added a visually hidden label for proper input association */}
+          <label htmlFor={`search-${generatedId}`} className="sr-only">
+            Filter by {searchKey}
+          </label>
           <Input
+            id={`search-${generatedId}`}
             placeholder={searchPlaceholder}
             value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ''}
             onChange={(event) =>
@@ -163,36 +171,41 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex items-center space-x-2">
           {totalElements !== undefined && (
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground" aria-live="polite">
               Showing {startElement}-{endElement} of {totalElements}
             </div>
           )}
           {pageSizeOptions && onPageSizeChange && (
-            <Select
-              value={String(currentPageSize)}
-              onValueChange={(value) => onPageSizeChange(Number(value))}
-            >
-              <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue placeholder={currentPageSize} />
-              </SelectTrigger>
-              <SelectContent side="top" align="end">
-                {pageSizeOptions.map((size) => (
-                  <SelectItem key={size} value={String(size)}>
-                    {size}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-1">
+              <Select
+                value={String(currentPageSize)}
+                onValueChange={(value) => onPageSizeChange(Number(value))}
+              >
+                {/* FIXED: Standardized label description for select element */}
+                <SelectTrigger className="h-8 w-[70px]" aria-label="Rows per page">
+                  <SelectValue placeholder={currentPageSize} />
+                </SelectTrigger>
+                <SelectContent side="top" align="end">
+                  {pageSizeOptions.map((size) => (
+                    <SelectItem key={size} value={String(size)}>
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           )}
         </div>
         <div className="flex items-center space-x-2">
           <div className="text-sm text-muted-foreground">
             Page {currentPageIndex + 1} of {totalPages}
           </div>
+          {/* FIXED: Contextually targeted dynamic description tags for buttons */}
           <Button
             variant="outline"
             size="sm"
             onClick={() => table.previousPage()}
+            aria-label={`Go to previous page. Currently on page ${currentPageIndex + 1}`}
             disabled={!table.getCanPreviousPage()}
           >
             Previous
@@ -201,6 +214,7 @@ export function DataTable<TData, TValue>({
             variant="outline"
             size="sm"
             onClick={() => table.nextPage()}
+            aria-label={`Go to next page. Current page is ${currentPageIndex + 1} of ${totalPages}`}
             disabled={!table.getCanNextPage()}
           >
             Next

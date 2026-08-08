@@ -4,6 +4,15 @@ import { resolve } from 'path';
 const root = resolve(__dirname, 'src');
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'lucide-vendor': ['lucide-react'],
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': root,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import { Shield, Plus, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,12 +10,12 @@ import { DataTable } from '@/components/data-table';
 import { Badge } from '@/components/ui/badge';
 
 import type { Permission } from '@/types';
-import toast from 'react-hot-toast';
 
-import { getAllPermissions, createPermission, updatePermission, deletePermission } from '@/services/permissionAction';
+
+import { getAllPermissions, deletePermission } from '@/services/permissionAction';
 import useAddPermissionModal from '@/hooks/useAddPermissionModal';
 
-export const PermissionsPage = () => {
+ const PermissionsPage = () => {
   const queryClient = useQueryClient();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null);
@@ -27,31 +27,31 @@ export const PermissionsPage = () => {
 
   const { onOpen } = useAddPermissionModal();
 
-  const createMutation = useMutation({
-    mutationFn: createPermission,
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['permissions'] }); toast.success('Permission created successfully'); },
-    onError: () => toast.error('Failed to create permission'),
-  });
+  // const createMutation = useMutation({
+  //   mutationFn: createPermission,
+  //   onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['permissions'] }); toast.success('Permission created successfully'); },
+  //   onError: () => toast.error('Failed to create permission'),
+  // });
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Permission> }) => updatePermission(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['permissions'] }); toast.success('Permission updated successfully'); },
-    onError: () => toast.error('Failed to update permission'),
-  });
+  // const updateMutation = useMutation({
+  //   mutationFn: ({ id, data }: { id: string; data: Partial<Permission> }) => updatePermission(id, data),
+  //   onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['permissions'] }); toast.success('Permission updated successfully'); },
+  //   onError: () => toast.error('Failed to update permission'),
+  // });
 
-  const deleteMutation = useMutation({
-    mutationFn: deletePermission,
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['permissions'] }); toast.success('Permission deleted successfully'); setDeleteOpen(false); },
-    onError: () => toast.error('Failed to delete permission'),
-  });
+  // const deleteMutation = useMutation({
+  //   mutationFn: deletePermission,
+  //   onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['permissions'] }); toast.success('Permission deleted successfully'); setDeleteOpen(false); },
+  //   onError: () => toast.error('Failed to delete permission'),
+  // });
 
   const handleCreate = () => { setSelectedPermission(null); onOpen(); };
   const handleEdit = (permission: Permission) => { setSelectedPermission(permission); };
   const handleDelete = (permission: Permission) => { setSelectedPermission(permission); setDeleteOpen(true); };
-  const handleSubmit = (data: Partial<Permission>) => {
-    if (selectedPermission) updateMutation.mutate({ id: selectedPermission.id, data });
-    else createMutation.mutate(data);
-  };
+  // const handleSubmit = (data: Partial<Permission>) => {
+  //   if (selectedPermission) updateMutation.mutate({ id: selectedPermission.id, data });
+  //   else createMutation.mutate(data);
+  // };
 
   const columns: ColumnDef<Permission>[] = [
     { accessorKey: 'name', header: 'Permission Name' },
@@ -106,3 +106,5 @@ export const PermissionsPage = () => {
     </div>
   );
 };
+
+export default PermissionsPage;

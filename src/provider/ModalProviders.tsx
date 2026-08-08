@@ -1,32 +1,36 @@
 
-import React from "react";
-import AddUserModal from "./AddUserModal";
-import AddRoleModal from "./AddRoleModal";
-import AddTeamModal from "./AddTeamModal";
-import AddTenantModal from "./AddTenantModal";
-import AddPermissionModal from "./AddPermissionModal";
-import AddDeviceModal from "./AddDeviceModal";
-import UpdateUserModal from "./UpdateUserModal";
-import UpdateRoleModal from "./UpdateRoleModal";
-import UpdateTeamModal from "./UpdateTeamModal";
-import UpdateTenantModal from "./UpdateTenantModal";
-import UpdateDeviceModal from "./UpdateDeviceModal";
+import { Spinner } from "@/components/ui/spinner";
+import { lazy, Suspense } from "react";
 
+
+
+const AddUserModal = lazy(() => import('./AddUserModal'));
+const UpdateUserModal = lazy(() => import('./UpdateUserModal'));
+const AddTenantModal = lazy(() => import('./AddTenantModal'));
+const AddPermissionModal = lazy(() => import('./AddPermissionModal'));
+const UpdateDeviceModal = lazy(() => import('./UpdateDeviceModal'));
+const AddDeviceModal = lazy(() => import('./AddDeviceModal'));
+const UpdateTenantModal = lazy(() => import('./UpdateTenantModal'));
+const UpdateRoleModal = lazy(() => import('./UpdateRoleModal'));
+const UpdateTeamModal = lazy(() => import('./UpdateTeamModal'));
+const AddRoleModal = lazy(() => import('./AddRoleModal'));
+const AddTeamModal = lazy(() => import('./AddTeamModal'));
 const ModalProviders = () => {
   return (
-    <>
+    <Suspense fallback={<Spinner />}>
       <AddUserModal />
       <AddRoleModal />
       <AddTeamModal />
       <AddTenantModal />
-      <UpdateTenantModal/>
+      <UpdateTenantModal />
       <AddPermissionModal />
-      <UpdateDeviceModal/>
+      <UpdateDeviceModal />
       <AddDeviceModal />
-      <UpdateUserModal/>
-      <UpdateRoleModal/>
-      <UpdateTeamModal/>
-    </>
+      <UpdateUserModal />
+      <UpdateRoleModal />
+      <UpdateTeamModal />
+    </Suspense>
+    
   );
 };
 

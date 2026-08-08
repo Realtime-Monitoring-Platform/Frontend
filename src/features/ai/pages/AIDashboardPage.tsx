@@ -6,7 +6,7 @@ import { TrendingUp, AlertTriangle, Lightbulb } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '../../../services/api';
 
-export const AIDashboardPage = () => {
+ const AIDashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [healthScore, setHealthScore] = useState<any>(null);
@@ -154,3 +154,5 @@ export const AIDashboardPage = () => {
     </div>
   );
 };
+
+export default AIDashboardPage;

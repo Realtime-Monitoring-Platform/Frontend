@@ -17,7 +17,7 @@ const forgotPasswordSchema = z.object({
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
-export const ForgotPasswordPage = () => {
+ const ForgotPasswordPage = () => {
   const [success, setSuccess] = useState(false);
 
   const {
@@ -92,3 +92,5 @@ export const ForgotPasswordPage = () => {
     </div>
   );
 };
+
+export default ForgotPasswordPage;

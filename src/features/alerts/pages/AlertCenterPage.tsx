@@ -13,7 +13,7 @@ import type { Alert as AlertType } from '@/types';
 import toast from 'react-hot-toast';
 // import { AlertActionForm, DeleteDialog } from '@/components/crud-forms';
 
-export const AlertCenterPage = () => {
+ const AlertCenterPage = () => {
   const queryClient = useQueryClient();
   const [ackOpen, setAckOpen] = useState(false);
   const [resolveOpen, setResolveOpen] = useState(false);
@@ -131,3 +131,4 @@ export const AlertCenterPage = () => {
     </div>
   );
 };
+export default AlertCenterPage;

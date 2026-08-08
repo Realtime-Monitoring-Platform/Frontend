@@ -25,7 +25,7 @@ const changePasswordSchema = z
 
 type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 
-export const ChangePasswordPage = () => {
+ const ChangePasswordPage = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [showCurrent, setShowCurrent] = useState(false);
@@ -190,3 +190,6 @@ export const ChangePasswordPage = () => {
     </div>
   );
 };
+
+
+export default ChangePasswordPage;

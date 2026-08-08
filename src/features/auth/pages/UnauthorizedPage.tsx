@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Lock } from 'lucide-react';
 
-export const UnauthorizedPage = () => {
+ const UnauthorizedPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export const UnauthorizedPage = () => {
         <CardContent className="p-8 text-center">
           <Lock className="mx-auto mb-6 h-16 w-16 text-warning" />
 
-          <Alert variant="warning" className="mb-6 text-left">
+          <Alert variant="default" className="mb-6 text-left">
             <AlertTitle>Unauthorized Access</AlertTitle>
             <AlertDescription>
               Please sign in to access this page.
@@ -41,3 +41,6 @@ export const UnauthorizedPage = () => {
     </div>
   );
 };
+
+
+export default UnauthorizedPage;

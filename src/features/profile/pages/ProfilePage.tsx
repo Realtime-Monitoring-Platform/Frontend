@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Mail } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 
-export const ProfilePage = () => {
+ const ProfilePage = () => {
   const { user } = useAuth();
   console.log("user data", user);
   if (!user) {
@@ -85,3 +85,5 @@ export const ProfilePage = () => {
     </div>
   );
 };
+
+export default ProfilePage;

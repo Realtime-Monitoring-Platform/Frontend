@@ -22,7 +22,7 @@ const resetPasswordSchema = z.object({
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
-export const ResetPasswordPage = () => {
+ const ResetPasswordPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -159,3 +159,6 @@ export const ResetPasswordPage = () => {
     </div>
   );
 };
+
+
+export default ResetPasswordPage;

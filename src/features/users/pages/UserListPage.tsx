@@ -28,6 +28,7 @@ import { useState } from 'react';
 import useUpdateUserModal from '@/hooks/useUpdateUserModal';
 import { useAuth } from '@/hooks/useAuth';
 
+
 const UserListPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -51,7 +52,6 @@ const UserListPage = () => {
   } = useQuery({
     queryKey: ["users", currentPage, pageSize],
     queryFn: () =>{ 
-      // user && user.role= "PLATFORM_ADMIN" ? getAllUsers(currentPage, pageSize) : getAllUsersByTenantId(user.tenantId, currentPage, pageSize) 
       if(user && user.role !== "PLATFORM_ADMIN"){
         console.log('Fetching users for tenantId:', user.tenantId);
         return getUsersByTenantId(user?.tenantId || '',currentPage, pageSize);
@@ -72,8 +72,6 @@ const UserListPage = () => {
     onSuccess: async () => {
       toast.success("User deleted successfully");
 
-      // Delay to allow the Kafka event to propagate from the user-management
-      // service to the query service before refetching the role list.
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       await queryClient.invalidateQueries({
@@ -89,7 +87,6 @@ const UserListPage = () => {
   console.log('Current user:', user?.role);
 
   const columns: ColumnDef<User>[] = [
-   // { accessorKey: 'id', header: 'ID' },
     { accessorKey: 'firstName', header: 'First Name' },
     { accessorKey: 'lastName', header: 'Last Name' },
     { accessorKey: 'email', header: 'Email' },
@@ -108,16 +105,21 @@ const UserListPage = () => {
       header: 'Actions',
       cell: ({ row }) => {
         const user = row.original;
+        const fullName = `${user.firstName} ${user.lastName}`;
+
         return (
           <div className="flex gap-1">
+            {/* View Details Button */}
             <Button
               size="sm"
               variant="ghost"
               onClick={() => navigate(`/users/${user.id}`)}
+              aria-label={`View details for ${fullName}`}
             >
-              <Eye className="h-4 w-4" />
+              <Eye className="h-4 w-4" aria-hidden="true" />
             </Button>
 
+            {/* Edit Button */}
             <Button
               size="sm"
               variant="ghost"
@@ -126,15 +128,22 @@ const UserListPage = () => {
                 onUpdateOpen();
               }}
               disabled={!canUpdate}
+              aria-label={`Edit user ${fullName}`}
             >
-              <Pencil className="h-4 w-4" />
+              <Pencil className="h-4 w-4" aria-hidden="true" />
             </Button>
 
-            {/* FIXED ALERT DIALOG */}
+            {/* Delete Trigger Button - fixed nested button markup with asChild */}
             <AlertDialog>
-              <AlertDialogTrigger >
-                <Button disabled={!canDelete} size="sm" variant="ghost" className="hover:bg-destructive/10">
-                  <Trash2 className="h-4 w-4 text-destructive" />
+              <AlertDialogTrigger asChild>
+                <Button 
+                  disabled={!canDelete} 
+                  size="sm" 
+                  variant="ghost" 
+                  className="hover:bg-destructive/10"
+                  aria-label={`Delete user ${fullName}`}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -143,7 +152,7 @@ const UserListPage = () => {
                   <AlertDialogDescription>
                     This action cannot be undone. This will permanently delete user{' '}
                     <span className="font-semibold text-foreground">
-                      {user.firstName} {user.lastName}
+                      {fullName}
                     </span>.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
@@ -155,12 +164,12 @@ const UserListPage = () => {
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     disabled={deleteMutation.isPending}
                     onClick={(e) => {
-                      e.preventDefault(); // Prevents instant closing while async mutation processes
+                      e.preventDefault(); 
                       deleteMutation.mutate(user.id);
                     }}
                   >
                     {deleteMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                     ) : (
                       'Delete'
                     )}
@@ -197,11 +206,11 @@ const UserListPage = () => {
         </div>
         <div className="flex gap-2">
           <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
+            <Download className="mr-2 h-4 w-4" aria-hidden="true" />
             Export
           </Button>
           <Button disabled={!canCreate} onClick={onOpen}>
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
             Add User
           </Button>
         </div>
@@ -235,6 +244,5 @@ const UserListPage = () => {
     </div>
   );
 };
-
 
 export default UserListPage;

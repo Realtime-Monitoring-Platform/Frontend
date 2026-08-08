@@ -195,9 +195,9 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
 
       <Separator />
 
-      <div className="p-4">
+      {/* <div className="p-4">
         <p className="text-xs text-muted-foreground">v1.0.0</p>
-      </div>
+      </div> */}
     </div>
   );
 

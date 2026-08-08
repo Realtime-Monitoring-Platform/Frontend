@@ -5,8 +5,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { api } from '../../../services/api';
 import { toast } from 'react-hot-toast';
-
-export const ActivateAccountPage = () => {
+ const ActivateAccountPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -72,3 +71,6 @@ export const ActivateAccountPage = () => {
     </div>
   );
 };
+
+
+export default ActivateAccountPage;

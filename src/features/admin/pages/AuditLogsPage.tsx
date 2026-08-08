@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { History } from 'lucide-react';
 
-export const AuditLogsPage = () => {
+ const AuditLogsPage = () => {
   return (
     <div className="space-y-6">
       <div>
@@ -21,3 +21,5 @@ export const AuditLogsPage = () => {
     </div>
   );
 };
+
+export default AuditLogsPage;

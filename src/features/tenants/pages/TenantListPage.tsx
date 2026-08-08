@@ -27,7 +27,7 @@ import useAddTenantModal from '@/hooks/useAddTenantModal';
 import useUpdateTeanntModal from '@/hooks/useUpdateTeanntModal';
 import { useAuth } from '@/hooks/useAuth';
 
-export const TenantListPage = () => {
+ const TenantListPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [formOpen, setFormOpen] = useState(false);
@@ -241,3 +241,5 @@ export const TenantListPage = () => {
     </div>
   );
 };
+
+export default TenantListPage;

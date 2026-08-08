@@ -35,7 +35,7 @@ import useUpdateUserModal from "@/hooks/useUpdateUserModal";
 import { useAuth } from "@/hooks/useAuth";
 
 
-export const RoleListPage = () => {
+const RoleListPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { onOpen } = useAddRoleModal();
@@ -299,3 +299,6 @@ export const RoleListPage = () => {
     </div>
   );
 };
+
+
+export default RoleListPage;

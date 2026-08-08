@@ -7,7 +7,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { api } from '../../../services/api';
 import { mockDeviceMetrics, mockDevices } from '@/services/mockData';
 
-export const MonitoringPage = () => {
+ const MonitoringPage = () => {
   //const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [devices, setDevices] = useState<any[]>([]);
@@ -160,3 +160,6 @@ export const MonitoringPage = () => {
     </div>
   );
 };
+
+
+export default MonitoringPage;

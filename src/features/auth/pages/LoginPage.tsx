@@ -19,7 +19,7 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-export const LoginPage = () => {
+ const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -139,3 +139,5 @@ export const LoginPage = () => {
     </div>
   );
 };
+
+export default LoginPage;

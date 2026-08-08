@@ -26,7 +26,7 @@ import { deleteDevice, getAllDeviceBytenanntId, getAllDevices } from '@/services
 import useUpdateDeviceModal from '@/hooks/useUpdateDeviceModal';
 import { useAuth } from '@/hooks/useAuth';
 
-export const DeviceListPage = () => {
+ const DeviceListPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
  
@@ -264,3 +264,6 @@ export const DeviceListPage = () => {
     </div>
   );
 };
+
+
+export default DeviceListPage;

@@ -7,7 +7,7 @@ import { Bell } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '../../../services/api';
 
-export const OperatorDashboard = () => {
+ const OperatorDashboard = () => {
   const { data: alertCounts, isLoading, error } = useQuery({
     queryKey: ['operator-dashboard'],
     queryFn: () => api.get('/operator/dashboard/alert-summary').then(res => res.data),
@@ -163,3 +163,5 @@ export const OperatorDashboard = () => {
     </div>
   );
 };
+
+export default OperatorDashboard;

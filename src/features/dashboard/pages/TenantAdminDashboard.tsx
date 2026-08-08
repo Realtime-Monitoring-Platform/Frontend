@@ -6,7 +6,7 @@ import { Users, Router, Bell, CheckCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '../../../services/api';
 
-export const TenantAdminDashboard = () => {
+ const TenantAdminDashboard = () => {
   const { data: kpisData, isLoading, error } = useQuery({
     queryKey: ['tenant-admin-dashboard'],
     queryFn: () => api.get('/tenant-admin/dashboard/kpis').then(res => res.data),
@@ -135,3 +135,5 @@ export const TenantAdminDashboard = () => {
     </div>
   );
 };
+
+export default TenantAdminDashboard;

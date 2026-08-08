@@ -6,7 +6,7 @@ import { TrendingUp, Building, Users, Router, Bell } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '../../../services/api';
 
-export const PlatformAdminDashboard = () => {
+ const PlatformAdminDashboard = () => {
   const { data: kpisData, isLoading, error } = useQuery({
     queryKey: ['platform-dashboard-kpis'],
     queryFn: () => api.get('/platform-admin/dashboard/kpis').then(res => res.data),
@@ -136,3 +136,5 @@ export const PlatformAdminDashboard = () => {
     </div>
   );
 };
+
+export default PlatformAdminDashboard;
