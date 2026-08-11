@@ -16,25 +16,6 @@ import ModalProviders from './provider/ModalProviders';
 import QueryProvider from './providers/QueryProvider';
 import ToastProviders from './providers/ToastProviders';
 
-/**
- * ============================================================
- * Lazy-loaded pages
- * ============================================================
- *
- * Each page is loaded only when the corresponding route
- * is accessed.
- *
- * Recommended: each page should use `export default`.
- * Example:
- *
- * export default function TenantListPage() {
- *   return (...);
- * }
- */
-
-/* ============================================================
- * Auth Pages
- * ============================================================ */
 
 const LoginPage = lazy(
   () => import('./features/auth/pages/LoginPage')
@@ -68,10 +49,6 @@ const ForbiddenPage = lazy(
   () => import('./features/auth/pages/ForbiddenPage')
 );
 
-/* ============================================================
- * Dashboard Pages
- * ============================================================ */
-
 const PlatformAdminDashboard = lazy(
   () => import('./features/dashboard/pages/PlatformAdminDashboard')
 );
@@ -92,33 +69,20 @@ const ViewerDashboard = lazy(
   () => import('./features/dashboard/pages/ViewerDashboard')
 );
 
-/* ============================================================
- * Tenant Pages
- * ============================================================ */
 
 const TenantListPage = lazy(
   () => import('./features/tenants/pages/TenantListPage')
 );
 
-/* ============================================================
- * User Pages
- * ============================================================ */
-
 const UserListPage = lazy(
   () => import('./features/users/pages/UserListPage')
 );
 
-/* ============================================================
- * Role Pages
- * ============================================================ */
 
 const RoleListPage = lazy(
   () => import('./features/roles/pages/RoleListPage')
 );
 
-/* ============================================================
- * Admin Pages
- * ============================================================ */
 
 const PermissionsPage = lazy(
   () => import('./features/admin/pages/PermissionsPage')
@@ -128,17 +92,10 @@ const AuditLogsPage = lazy(
   () => import('./features/admin/pages/AuditLogsPage')
 );
 
-/* ============================================================
- * Team Pages
- * ============================================================ */
 
 const TeamListPage = lazy(
   () => import('./features/teams/pages/TeamListPage')
 );
-
-/* ============================================================
- * Device Pages
- * ============================================================ */
 
 const DeviceListPage = lazy(
   () => import('./features/devices/pages/DeviceListPage')
@@ -148,67 +105,41 @@ const DeviceDetailsPage = lazy(
   () => import('./features/devices/pages/DeviceDetailsPage')
 );
 
-/* ============================================================
- * Alert Pages
- * ============================================================ */
 
 const AlertCenterPage = lazy(
   () => import('./features/alerts/pages/AlertCenterPage')
 );
 
-/* ============================================================
- * Report Pages
- * ============================================================ */
-
 const ReportsPage = lazy(
   () => import('./features/reports/pages/ReportsPage')
 );
 
-/* ============================================================
- * Monitoring Pages
- * ============================================================ */
 
 const MonitoringPage = lazy(
   () => import('./features/monitoring/pages/MonitoringPage')
 );
 
-/* ============================================================
- * Profile Pages
- * ============================================================ */
 
 const ProfilePage = lazy(
   () => import('./features/profile/pages/ProfilePage')
 );
 
-/* ============================================================
- * Settings Pages
- * ============================================================ */
 
 const SettingsPage = lazy(
   () => import('./features/settings/pages/SettingsPage')
 );
 
-/* ============================================================
- * AI Pages
- * ============================================================ */
 
 const AIDashboardPage = lazy(
   () => import('./features/ai/pages/AIDashboardPage')
 );
 
-/* ============================================================
- * Notifications
- * ============================================================ */
 
 const NotificationsPage = lazy(
   () => import('./features/notifications/pages/NotificationsPage')
 );
 
-/**
- * ============================================================
- * Page Loader
- * ============================================================
- */
+
 
 const PageLoader = () => {
   return (
@@ -218,11 +149,7 @@ const PageLoader = () => {
   );
 };
 
-/**
- * ============================================================
- * Protected Route
- * ============================================================
- */
+
 
 export const ProtectedRoute = ({
   children,
@@ -231,16 +158,12 @@ export const ProtectedRoute = ({
 }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
-  /**
-   * Authentication state is still being determined.
-   */
+
   if (isLoading) {
     return <PageLoader />;
   }
 
-  /**
-   * User is not authenticated.
-   */
+
   if (!isAuthenticated) {
     return <Navigate to="/auth/login" replace />;
   }
@@ -248,11 +171,7 @@ export const ProtectedRoute = ({
   return <>{children}</>;
 };
 
-/**
- * ============================================================
- * Permission Route
- * ============================================================
- */
+
 
 const PermissionRoute = ({
   children,
@@ -263,16 +182,12 @@ const PermissionRoute = ({
 }) => {
   const { hasPermission } = useAuth();
 
-  /**
-   * No permissions required.
-   */
+
   if (!requiredPermissions || requiredPermissions.length === 0) {
     return <>{children}</>;
   }
 
-  /**
-   * User needs at least one of the required permissions.
-   */
+
   const hasAccess = requiredPermissions.some((permission) =>
     hasPermission(permission)
   );
@@ -284,11 +199,7 @@ const PermissionRoute = ({
   return <>{children}</>;
 };
 
-/**
- * ============================================================
- * Role Dashboard
- * ============================================================
- */
+
 
 const RoleDashboard = () => {
   const { user } = useAuth();
@@ -315,9 +226,6 @@ const RoleDashboard = () => {
 
   const DashboardComponent = dashboardMap[roleName];
 
-  /**
-   * Unknown or unsupported role.
-   */
   if (!DashboardComponent) {
     return <Navigate to="/auth/forbidden" replace />;
   }
@@ -325,20 +233,11 @@ const RoleDashboard = () => {
   return <DashboardComponent />;
 };
 
-/**
- * ============================================================
- * Application Routes
- * ============================================================
- */
-
 const AppRoutes = () => {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
 
-        {/* ====================================================
-            Authentication Routes
-        ==================================================== */}
 
         <Route
           path="/auth/login"
@@ -380,9 +279,6 @@ const AppRoutes = () => {
           element={<ForbiddenPage />}
         />
 
-        {/* ====================================================
-            Protected Application
-        ==================================================== */}
 
         <Route
           path="/"
@@ -393,9 +289,6 @@ const AppRoutes = () => {
           }
         >
 
-          {/* ==================================================
-              Dashboard
-          ================================================== */}
 
           <Route
             index
@@ -407,9 +300,6 @@ const AppRoutes = () => {
             element={<RoleDashboard />}
           />
 
-          {/* ==================================================
-              Platform Admin
-          ================================================== */}
 
           <Route
             path="tenants"
@@ -486,9 +376,6 @@ const AppRoutes = () => {
             }
           />
 
-          {/* ==================================================
-              Tenant Admin
-          ================================================== */}
 
           <Route
             path="teams"
@@ -568,9 +455,6 @@ const AppRoutes = () => {
             }
           />
 
-          {/* ==================================================
-              Embedded Engineer
-          ================================================== */}
 
           <Route
             path="my-devices"
@@ -586,9 +470,6 @@ const AppRoutes = () => {
             }
           />
 
-          {/* ==================================================
-              Operator
-          ================================================== */}
 
           <Route
             path="monitoring"
@@ -603,9 +484,6 @@ const AppRoutes = () => {
             }
           />
 
-          {/* ==================================================
-              Shared
-          ================================================== */}
 
           <Route
             path="profile"
@@ -642,9 +520,6 @@ const AppRoutes = () => {
 
         </Route>
 
-        {/* ====================================================
-            Catch All
-        ==================================================== */}
 
         <Route
           path="*"
@@ -656,11 +531,6 @@ const AppRoutes = () => {
   );
 };
 
-/**
- * ============================================================
- * Main Application
- * ============================================================
- */
 
 const App = () => {
   return (

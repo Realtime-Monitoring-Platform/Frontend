@@ -1,4 +1,4 @@
-import * as React from 'react';
+
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -29,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useId, useState } from 'react';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -64,12 +65,12 @@ export function DataTable<TData, TValue>({
   pageSizeOptions,
   onPageSizeChange,
 }: DataTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [sorting, setSorting] = useState<SortingState>([]);
   
   // Unique ID for connecting the search input with its hidden label
-  const generatedId = React.useId();
+  const generatedId = useId();
 
   const table = useReactTable({
     data,

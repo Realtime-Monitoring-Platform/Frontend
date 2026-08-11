@@ -121,6 +121,7 @@ import { useAuth } from '@/hooks/useAuth';
               <Button
                 size="sm"
                 variant="ghost"
+                 aria-label={`Update team ${role.name}`}
                 onClick={() => {
                   setId(role.id);
                   openUpdateTeamModal();
@@ -137,6 +138,7 @@ import { useAuth } from '@/hooks/useAuth';
                   <Button
                     size="sm"
                     variant="ghost"
+                     aria-label={`Delete team ${role.name}`}
                     className="hover:bg-destructive/10"
                     disabled={!canDelete}
                   >
@@ -209,7 +211,7 @@ import { useAuth } from '@/hooks/useAuth';
           <h1 className="text-3xl font-bold">Teams</h1>
           <p className="text-sm text-muted-foreground">Manage teams and assignments</p>
         </div>
-        <Button disabled={!canCreate} onClick={onOpen}>
+        <Button  aria-label={`Add team`} disabled={!canCreate} onClick={onOpen}>
           <Plus className="mr-2 h-4 w-4" />Add Team
         </Button>
       </div>

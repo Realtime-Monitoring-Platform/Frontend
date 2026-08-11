@@ -8,7 +8,7 @@ class ApiService {
 
   constructor() {
     this.client = axios.create({
-      baseURL: API_BASE_URL,
+      baseURL: "http://localhost:8222/api/v1",
       //authorization: `Bearer ${localStorage.getItem('access_token')}`,
       timeout: 30000,
       headers: {
@@ -46,7 +46,7 @@ class ApiService {
           if (refresh_Token) {
             try {
 
-              const response = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {
+              const response = await axios.post(`'http://localhost:8222/api/v1/auth/refresh-token`, {
                 refresh_Token,
               });
               const { access_token } = response.data;

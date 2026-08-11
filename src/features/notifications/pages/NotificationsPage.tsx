@@ -266,6 +266,7 @@ export const NotificationsPage = () => {
                       <div className="flex items-center gap-1">
                         {!notification.read && (
                           <Button
+                             aria-label={`Mark notification as read`}
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
@@ -281,6 +282,7 @@ export const NotificationsPage = () => {
                           className="h-8 w-8 text-destructive hover:text-destructive"
                           onClick={() => deleteMutation.mutate(notification.id)}
                           title="Delete notification"
+                          aria-label={`Delete notification ${notification.title}`}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

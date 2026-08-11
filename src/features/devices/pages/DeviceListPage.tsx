@@ -112,6 +112,7 @@ import { useAuth } from '@/hooks/useAuth';
           <div className="flex gap-1">
 
             <Button
+             aria-label={`Delete device ${device.deviceName}`}
               size="sm"
               variant="ghost"
               onClick={() =>
@@ -124,6 +125,7 @@ import { useAuth } from '@/hooks/useAuth';
               <Button
                 size="sm"
                 variant="ghost"
+                aria-label={`Update device ${device.deviceName}`}
                 onClick={() => {
                   setId(device.id);
                   onUpdateOpen()
@@ -139,6 +141,7 @@ import { useAuth } from '@/hooks/useAuth';
                   <Button
                     size="sm"
                     variant="ghost"
+                    aria-label={`Delete device ${device.deviceName}`}
                     className="hover:bg-destructive/10"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -213,8 +216,10 @@ import { useAuth } from '@/hooks/useAuth';
           <p className="text-sm text-muted-foreground">Manage and monitor your devices</p>
         </div>
         <div className="flex gap-2">
-         <Button variant="outline"><Download className="mr-2 h-4 w-4" />Export</Button>
-          <Button onClick={handleCreate}><Plus className="mr-2 h-4 w-4" />Register Device</Button>
+         <Button  aria-label={`Export devices`} variant="outline"><Download className="mr-2 h-4 w-4" />Export</Button>
+          <Button  aria-label={`Register device`} onClick={handleCreate}>
+            <Plus className="mr-2 h-4 w-4" />Register Device
+          </Button>
         </div>
       </div>
 

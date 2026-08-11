@@ -27,7 +27,7 @@ import useAddTenantModal from '@/hooks/useAddTenantModal';
 import useUpdateTeanntModal from '@/hooks/useUpdateTeanntModal';
 import { useAuth } from '@/hooks/useAuth';
 
- const TenantListPage = () => {
+const TenantListPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [formOpen, setFormOpen] = useState(false);
@@ -115,7 +115,7 @@ import { useAuth } from '@/hooks/useAuth';
         const tenant = row.original;
         return (
           <div className="flex gap-1">
-            <Button size="sm" variant="ghost" onClick={() => navigate(`/tenants/${tenant.id}`)}>
+            <Button size="sm" aria-label={`Delete ${tenant.name}`} variant="ghost" onClick={() => navigate(`/tenants/${tenant.id}`)}>
               <Eye className="h-4 w-4" />
             </Button>
             {/* <Button size="sm" variant="ghost" onClick={() => handleEdit(tenant)}>
@@ -125,6 +125,7 @@ import { useAuth } from '@/hooks/useAuth';
 
             <>
               <Button
+                aria-label={`Update ${tenant.name}`}
                 size="sm"
                 variant="ghost"
                 disabled={!canUpdate}
@@ -142,6 +143,7 @@ import { useAuth } from '@/hooks/useAuth';
                 <AlertDialogTrigger asChild>
                   <Button
                     size="sm"
+                    aria-label={`Delete  ${tenant.name}`}
                     variant="ghost"
                     disabled={!canDelete}
                     className="hover:bg-destructive/10"
@@ -149,12 +151,8 @@ import { useAuth } from '@/hooks/useAuth';
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </AlertDialogTrigger>
-
-
                 <AlertDialogContent>
-
                   <AlertDialogHeader>
-
                     <AlertDialogTitle>
                       Are you absolutely sure?
                     </AlertDialogTitle>
@@ -186,13 +184,9 @@ import { useAuth } from '@/hooks/useAuth';
                       )}
                     </AlertDialogAction>
                   </AlertDialogFooter>
-
                 </AlertDialogContent>
-
               </AlertDialog>
             </>
-
-
           </div>
         );
       },

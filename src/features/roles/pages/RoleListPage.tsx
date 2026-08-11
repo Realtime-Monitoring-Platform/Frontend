@@ -123,6 +123,7 @@ const RoleListPage = () => {
           <div className="flex gap-1">
 
             <Button
+             aria-label={`View role ${role.name}`}
               size="sm"
               variant="ghost"
               onClick={() =>
@@ -136,6 +137,7 @@ const RoleListPage = () => {
 
             <>
               <Button
+                aria-label={`Update role ${role.name}`}
                 size="sm"
                 variant="ghost"
                 onClick={() => {
@@ -152,6 +154,7 @@ const RoleListPage = () => {
 
                 <AlertDialogTrigger asChild>
                   <Button
+                     aria-label={`Delete role ${role.name}`}
                     size="sm"
                     variant="ghost"
                     className="hover:bg-destructive/10"
