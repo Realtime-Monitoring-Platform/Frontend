@@ -39,7 +39,7 @@ export interface User {
   teamId?: string;
   roleId?: string;
   roleName?: string;
-  
+
   tenantId?: string;
   tenantName?: string;
   lastLogin?: string;
@@ -318,10 +318,17 @@ export interface Notification {
   read: boolean;
   timestamp: string;
   link?: string;
-   userId :string;
-   tenantId :string;
-createdAt:Date;
+  userId: string;
+  tenantId: string;
+  createdAt: Date;
+}
 
+export interface Metrics {
+  device_id?: string;
+  tenant_id?: string;
+  timestamp: string;
+  cpu: number;
+  ram: number;
 }
 
 // Audit types
@@ -348,7 +355,7 @@ export interface Report {
   format: ReportFormat;
   generatedBy: string;
 
-generatedAt: string;
+  generatedAt: string;
   downloadUrl: string;
   parameters?: Record<string, any>;
 }
