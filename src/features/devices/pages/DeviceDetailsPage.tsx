@@ -9,6 +9,7 @@ import { Router, Gauge, Network, Thermometer } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
 import { api } from '../../../services/api';
 import { Metrics } from '@/types';
+import DeviceTerminal from '@/components/Deviceterminal';
 
 // ---------- Time range options ----------
 
@@ -391,8 +392,8 @@ const DeviceDetailsPage = () => {
               <CardHeader>
                 <CardTitle>Command History</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Command history will be implemented here</p>
+              <CardContent className="w-full">
+                <DeviceTerminal  deviceId={id}/>
               </CardContent>
             </Card>
           </TabsContent>
