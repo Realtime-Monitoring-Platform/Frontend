@@ -323,6 +323,15 @@ export interface Notification {
   createdAt: Date;
 }
 
+export interface DeviceLogEvent {
+    deviceId: string;
+    tenantId: string;
+    level: "INFO" | "WARN" | "ERROR" | string;
+    message: string;
+    timestamp: number; // unix millis, from the Rust agent
+}
+
+
 export interface Metrics {
   device_id?: string;
   tenant_id?: string;
