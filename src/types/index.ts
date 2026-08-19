@@ -324,11 +324,11 @@ export interface Notification {
 }
 
 export interface DeviceLogEvent {
-    deviceId: string;
-    tenantId: string;
-    level: "INFO" | "WARN" | "ERROR" | string;
-    message: string;
-    timestamp: number; // unix millis, from the Rust agent
+  deviceId: string;
+  tenantId: string;
+  level: "INFO" | "WARN" | "ERROR" | string;
+  message: string;
+  timestamp: number; // unix millis, from the Rust agent
 }
 
 
@@ -420,4 +420,34 @@ export interface Pagination<T> {
   },
   totalElements: number,
   totalPages: number
+}
+
+
+export interface DeviceCommand {
+  id: string;
+  deviceId: string;
+  tenantId: string;
+  userId: string;
+  command: string;
+  status: CommandStatus;
+  stdout: string | null;
+  exitCode: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type LineType = "system" | "prompt" | "pending" | "output" | "error";
+
+export interface TerminalLine {
+  type: LineType;
+  text: string;
+  time?: string;
+  status?: CommandStatus;
+  exitCode?: number | null;
+  id?: string;
+}
+
+export interface DeviceTerminalProps {
+  deviceId?: string;
+  authHeaders?: Record<string, string>;
 }

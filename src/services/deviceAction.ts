@@ -5,6 +5,31 @@ import { api } from "./api";
 ///tenant/{tenantId}
 
 
+// useEffect(() => {
+//         fetchDevice();
+//     }, [id, timeRange]);
+
+//     const fetchDevice = async () => {
+//         setLoading(true);
+//         setError(null);
+//         try {
+//             const response = await api.get(`/query/metrics/deviceid/${id}?startTime=${timeRange}`);
+//             setMetrics(response.data);
+//         } catch (err) {
+//             setError('Failed to load metrics details');
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+export const fetchDeviceMetrics = async (deviceId: string, startTime: string): Promise<any> => {
+    try {
+        const response = await api.get(`/query/metrics/deviceid/${deviceId}?startTime=${startTime}`);
+        return response.data;
+    } catch (error) {
+        throw new Error('Failed to fetch device metrics');
+    }
+};
 
 export const getAllDeviceBytenanntId = async (tenantId:string,page = 0, size = 10): Promise<Pagination<Device>> =>{
     try {
