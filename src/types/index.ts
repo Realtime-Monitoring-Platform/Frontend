@@ -4,7 +4,6 @@ export type UserRole = 'PLATFORM_ADMIN' | 'TENANT_ADMIN' | 'EMBEDDED_ENGINEER' |
 
 export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'LOCKED' | 'PENDING_ACTIVATION';
 
-export type DeviceStatus = 'ONLINE' | 'OFFLINE' | 'WARNING' | 'ERROR';
 
 export type DeviceType = 'SENSOR' | 'GATEWAY' | 'CONTROLLER' | 'SENSOR_ARRAY' | 'ACTUATOR' | 'CAMERA';
 
@@ -108,24 +107,44 @@ export interface Tenant {
 
 
 
-// Device types
+export enum DeviceStatus {
+  
+    REGISTERING="REGISTERING",
+    
+    DISCONNECTED="DISCONNECTED",
+    RETIRED="RETIRED",
+    ONLINE = "ONLINE",
+    OFFLINE = "OFFLINE",
+    MAINTENANCE = "MAINTENANCE",
+    WARNING = "WARNING"
+}
+
 export interface Device {
-  id: string;
-  deviceName: string
-  teamId: string
-  assignedUserId: string
-  firmwareVersion: string
-  tenantId: string
-  model: string
-  manufacturer: string
-  hostname: string
-  ipAddress: string
-  macAddress: string
-  location: string
-  status: string
-
-
-
+    id: string; 
+    tenantId: string; 
+    teamId?: string; 
+    teamName?: string;
+    tenantName?: string;
+    assignedUserName?: string;
+    assignedUserId?: string; // UUID
+    deviceName: string;
+    description?: string;
+    model?: string;
+    manufacturer?: string;
+    hostname: string;
+    ipAddress?: string;
+    macAddress?: string;
+    deviceIdentifier?: string;
+    location?: string;
+    status?: DeviceStatus;
+    osName?: string;
+    osVersion?: string;
+    kernelVersion?: string;
+    cpuCount?: number;
+    totalMemoryKb?: number;
+    lastSeen?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface createDeviceDto {
