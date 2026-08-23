@@ -74,6 +74,10 @@ const TenantListPage = lazy(
   () => import('./features/tenants/pages/TenantListPage')
 );
 
+const TenantDetailsPage = lazy(
+  () => import('./features/tenants/pages/TenantDetailsPage')
+);
+
 const UserListPage = lazy(
   () => import('./features/users/pages/UserListPage')
 );
@@ -313,6 +317,20 @@ const AppRoutes = () => {
                 ]}
               >
                 <TenantListPage />
+              </PermissionRoute>
+            }
+          />
+
+          <Route
+            path="tenants/:id"
+            element={
+              <PermissionRoute
+                requiredPermissions={[
+                  'TENANT_READ',
+                  'TENANT_UPDATE',
+                ]}
+              >
+                <TenantDetailsPage />
               </PermissionRoute>
             }
           />

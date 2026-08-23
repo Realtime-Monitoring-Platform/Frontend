@@ -42,14 +42,7 @@ const formSchema = z.object({
   tenantId: z.string().min(1, "Tenant is required"),
   teamId: z.string().min(1, "Team is required"),
   assignedUserId: z.string().min(1, "Assigned user is required"),
-  manufacturer: z.string().min(1, "Manufacturer is required"),
-  model: z.string().min(1, "Model is required"),
-  firmwareVersion: z.string().min(1, "Firmware version is required"),
-  hostname: z.string().min(1, "Hostname is required"),
-  ipAddress: z.string().min(1, "IP address is required"),
-  macAddress: z.string().min(1, "MAC address is required"),
-  location: z.string().min(1, "Location is required"),
-  status: z.string().min(1, "Status is required"),
+ 
 });
 type FormValues = z.infer<typeof formSchema>;
 const AddDeviceForm = () => {
@@ -62,14 +55,8 @@ const AddDeviceForm = () => {
       tenantId: "",
       teamId: "",
       assignedUserId: user?.id || "",
-      manufacturer: "",
-      model: "",
-      firmwareVersion: "",
-      hostname: "",
-      ipAddress: "",
-      macAddress: "",
-      location: "",
-      status: "OFFLINE",
+      
+    
     }
   });
   const { onClose } = useAddDeviceModal();
@@ -232,97 +219,16 @@ const AddDeviceForm = () => {
           )}
         /> */}
 
-        {/* Manufacturer */}
-        <FormField
-          control={form.control}
-          name="manufacturer"
-          render={({ field }) => (
-            <FormItem className="grid grid-cols-4 items-center gap-4">
-              <FormLabel className="text-right">Manufacturer</FormLabel>
-              <FormControl>
-                <Input className="col-span-3" {...field} />
-              </FormControl>
-              <FormMessage className="col-span-3 col-start-2" />
-            </FormItem>
-          )}
-        />
+      
 
-        {/* Model */}
-        <FormField
-          control={form.control}
-          name="model"
-          render={({ field }) => (
-            <FormItem className="grid grid-cols-4 items-center gap-4">
-              <FormLabel className="text-right">Model</FormLabel>
-              <FormControl>
-                <Input className="col-span-3" {...field} />
-              </FormControl>
-              <FormMessage className="col-span-3 col-start-2" />
-            </FormItem>
-          )}
-        />
 
-        {/* Firmware */}
-        <FormField
-          control={form.control}
-          name="firmwareVersion"
-          render={({ field }) => (
-            <FormItem className="grid grid-cols-4 items-center gap-4">
-              <FormLabel className="text-right">Firmware</FormLabel>
-              <FormControl>
-                <Input className="col-span-3" {...field} />
-              </FormControl>
-              <FormMessage className="col-span-3 col-start-2" />
-            </FormItem>
-          )}
-        />
+       
 
-        {/* Hostname */}
-        <FormField
-          control={form.control}
-          name="hostname"
-          render={({ field }) => (
-            <FormItem className="grid grid-cols-4 items-center gap-4">
-              <FormLabel className="text-right">Hostname</FormLabel>
-              <FormControl>
-                <Input className="col-span-3" {...field} />
-              </FormControl>
-              <FormMessage className="col-span-3 col-start-2" />
-            </FormItem>
-          )}
-        />
+       
 
-        {/* IP Address */}
-        <FormField
-          control={form.control}
-          name="ipAddress"
-          render={({ field }) => (
-            <FormItem className="grid grid-cols-4 items-center gap-4">
-              <FormLabel className="text-right">IP Address</FormLabel>
-              <FormControl>
-                <Input className="col-span-3" {...field} />
-              </FormControl>
-              <FormMessage className="col-span-3 col-start-2" />
-            </FormItem>
-          )}
-        />
+     
 
-        {/* MAC Address */}
-        <FormField
-          control={form.control}
-          name="macAddress"
-          render={({ field }) => (
-            <FormItem className="grid grid-cols-4 items-center gap-4">
-              <FormLabel className="text-right">MAC Address</FormLabel>
-              <FormControl>
-                <Input className="col-span-3" {...field} />
-              </FormControl>
-              <FormMessage className="col-span-3 col-start-2" />
-            </FormItem>
-          )}
-        />
-
-        {/* Location */}
+        {/* Location
         <FormField
           control={form.control}
           name="location"
@@ -337,7 +243,7 @@ const AddDeviceForm = () => {
           )}
         />
 
-        {/* Status */}
+      
         <FormField
           control={form.control}
           name="status"
@@ -360,7 +266,7 @@ const AddDeviceForm = () => {
               <FormMessage className="col-span-3 col-start-2" />
             </FormItem>
           )}
-        />
+        /> */}
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onClose}>

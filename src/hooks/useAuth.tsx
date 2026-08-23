@@ -9,7 +9,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   isFirstLogin: boolean;
-  login: (credentials: LoginRequest) => Promise<boolean>;
+  login: (credentials: LoginRequest) => Promise<LoginResponse>;
   logout: () => void;
   completeFirstLogin: () => void;
   hasRole: (role: string) => boolean;
@@ -45,28 +45,61 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initAuth();
   }, []);
 
-  const login = async (credentials: LoginRequest) => {
-    try {
-      const response = await api.post<LoginResponse>('/auth/authenticate', {
+  const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
+  try {
+    const { data } = await api.post<LoginResponse>(
+      '/auth/authenticate',
+      {
         email: credentials.email,
         password: credentials.password,
-      });
-      const { access_token, refresh_token, first_login } = response.data;
-      console.log('Login successful:', response.data);
-      setCookie('access_token', access_token, { path: '/' });
-      setCookie('refresh_Token', refresh_token, { path: '/' });
-      localStorage.setItem('access_token', access_token);
-      localStorage.setItem('refresh_token', refresh_token);
+      }
+    );
 
-      setIsFirstLogin(first_login === true);
+    const {
+      access_token,
+      refresh_token,
+      first_login,
+    } = data;
 
-      toast.success(`Welcome back!`);
-      return first_login === true;
-    } catch (error) {
-      toast.error('Login failed. Please check your credentials.');
-      throw error;
-    }
-  };
+    console.log('Login successful:', data);
+
+    setCookie('access_token', access_token, { path: '/' });
+    localStorage.setItem('access_token', access_token);
+    localStorage.setItem('refresh_token', refresh_token);
+
+  
+    setIsFirstLogin(first_login === true);
+
+    toast.success(first_login ? 'Welcome! Please complete your profile.' : 'Welcome back!');
+
+    return data;
+  } catch (error) {
+    toast.error('Login failed. Please check your credentials.');
+    throw error;
+  }
+};
+  // const login = async (credentials: LoginRequest) => {
+  //   try {
+  //     const response = await api.post<LoginResponse>('/auth/authenticate', {
+  //       email: credentials.email,
+  //       password: credentials.password,
+  //     });
+  //     const { access_token, refresh_token, first_login } = response.data;
+  //     console.log('Login successful:', response.data);
+  //     setCookie('access_token', access_token, { path: '/' });
+  //     setCookie('refresh_Token', refresh_token, { path: '/' });
+  //     localStorage.setItem('access_token', access_token);
+  //     localStorage.setItem('refresh_token', refresh_token);
+
+  //     setIsFirstLogin(first_login === true);
+
+  //     toast.success(`Welcome back!`);
+  //     return first_login === true;
+  //   } catch (error) {
+  //     toast.error('Login failed. Please check your credentials.');
+  //     throw error;
+  //   }
+  // };
 
   const completeFirstLogin = () => {
     setIsFirstLogin(false);

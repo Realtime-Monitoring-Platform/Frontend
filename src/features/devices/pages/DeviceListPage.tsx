@@ -26,34 +26,34 @@ import { deleteDevice, getAllDeviceBytenanntId, getAllDevices } from '@/services
 import useUpdateDeviceModal from '@/hooks/useUpdateDeviceModal';
 import { useAuth } from '@/hooks/useAuth';
 
- const DeviceListPage = () => {
+const DeviceListPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
- 
+
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-  const {user} = useAuth();
+  const { user } = useAuth();
   const fetchDevices = () => {
-    if(user?.role !== "PLATFORM_ADMIN"){
-        return getAllDeviceBytenanntId(user?.tenantId || '', currentPage, pageSize);
+    if (user?.role !== "PLATFORM_ADMIN") {
+      return getAllDeviceBytenanntId(user?.tenantId || '', currentPage, pageSize);
     }
 
     return getAllDevices(currentPage, pageSize);
-}
- 
+  }
+
   const {
     data: devices,
-   
+
   } = useQuery({
     queryKey: ["devices", currentPage, pageSize],
     queryFn: fetchDevices,
     staleTime: 1000 * 60 * 5, // 5 min
     gcTime: 1000 * 60 * 10,
-});
+  });
   console.log(devices)
 
- 
+
 
 
   const { onOpen } = useAddDeviceModal();
@@ -76,25 +76,43 @@ import { useAuth } from '@/hooks/useAuth';
     },
   });
   const handleCreate = () => { setSelectedDevice(null); onOpen(); };
-  
-  
+
+
 
   const { setId, onOpen: onUpdateOpen } = useUpdateDeviceModal()
 
   const columns: ColumnDef<Device>[] = [
 
-    { accessorKey: 'deviceName', header: 'Name' },
-    { accessorKey: 'hostname', header: 'Hostname' },
-    { accessorKey: 'ipAddress', header: 'IP Address' },
+    {
+      accessorKey: 'deviceName', header: 'Name',
+      cell: ({ getValue }) => {
+        const value = getValue() as string;
+        return value || 'N/A'
+      }
+    },
+    {
+      accessorKey: 'hostname', header: 'Hostname',
+      cell: ({ getValue }) => {
+        const value = getValue() as string;
+        return value || 'N/A'
+      }
+    },
+    {
+      accessorKey: 'ipAddress', header: 'IP Address',
+      cell: ({ getValue }) => {
+        const value = getValue() as string;
+        return value || 'N/A';
+      }
+    },
     {
       accessorKey: 'status',
       header: 'Status',
       cell: ({ getValue }) => {
         const value = getValue() as string;
-        return <Badge>{value}</Badge>;
+        return <Badge>{value} </Badge>;
       },
     },
-    { accessorKey: 'location', header: 'Location' },
+
     {
       accessorKey: 'lastSeen',
       header: 'Last Seen',
@@ -112,7 +130,7 @@ import { useAuth } from '@/hooks/useAuth';
           <div className="flex gap-1">
 
             <Button
-             aria-label={`Delete device ${device.deviceName}`}
+              aria-label={`Delete device ${device.deviceName}`}
               size="sm"
               variant="ghost"
               onClick={() =>
@@ -216,8 +234,8 @@ import { useAuth } from '@/hooks/useAuth';
           <p className="text-sm text-muted-foreground">Manage and monitor your devices</p>
         </div>
         <div className="flex gap-2">
-         <Button  aria-label={`Export devices`} variant="outline"><Download className="mr-2 h-4 w-4" />Export</Button>
-          <Button  aria-label={`Register device`} onClick={handleCreate}>
+          <Button aria-label={`Export devices`} variant="outline"><Download className="mr-2 h-4 w-4" />Export</Button>
+          <Button aria-label={`Register device`} onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />Register Device
           </Button>
         </div>
@@ -228,7 +246,7 @@ import { useAuth } from '@/hooks/useAuth';
           <DataTable
             columns={columns}
             data={devices?.content || []}
-            searchKey="name"
+            searchKey="deviceName"
             searchPlaceholder="Search devices..."
             manualPagination
             pageCount={devices?.totalPages || 0}

@@ -37,9 +37,12 @@ type LoginFormData = z.infer<typeof loginSchema>;
     try {
       setError(null);
       console.log(data);
-      const isFirstLogin = await login(data);
-      if (isFirstLogin) {
+      const loginResponse = await login(data);
+      if (loginResponse.first_login) {
         navigate('/auth/change-password');
+      if(loginResponse.user.role === 'admin') {
+        navigate('/users');
+      }
       } else {
         console.log('Login successful for user:', data.email);
         navigate('/users');
