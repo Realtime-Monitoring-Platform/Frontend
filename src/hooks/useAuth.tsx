@@ -3,6 +3,7 @@ import { User, LoginRequest, LoginResponse } from '@/types';
 import { api } from '../services/api';
 import { useCookies } from 'react-cookie';
 import { toast } from 'react-hot-toast';
+import { redirect } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
@@ -71,7 +72,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsFirstLogin(first_login === true);
 
     toast.success(first_login ? 'Welcome! Please complete your profile.' : 'Welcome back!');
-
+    console.log('Redirecting to dashboard...');
+    redirect('/dashboard');
     return data;
   } catch (error) {
     toast.error('Login failed. Please check your credentials.');

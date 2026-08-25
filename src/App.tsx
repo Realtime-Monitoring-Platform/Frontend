@@ -15,6 +15,7 @@ import { CookiesProvider } from 'react-cookie';
 import ModalProviders from './provider/ModalProviders';
 import QueryProvider from './providers/QueryProvider';
 import ToastProviders from './providers/ToastProviders';
+import { RoleEnum } from './types';
 
 
 const LoginPage = lazy(
@@ -205,37 +206,34 @@ const PermissionRoute = ({
 
 
 
-const RoleDashboard = () => {
-  const { user } = useAuth();
+// const RoleDashboard = () => {
+//   const { user } = useAuth();
+//   console.log('RoleDashboard user:', user);
+//   console.log('RoleDashboard role:', user?.role);
+//   if (!user) {
+//     return null;
+//   }
+//   const dashboardMap: Record<
+//     RoleEnum,
+//     React.LazyExoticComponent<React.ComponentType>
+//   > = {
+//     [RoleEnum.PLATFORM_ADMIN]: PlatformAdminDashboard,
+//     [RoleEnum.TENANT_ADMIN]: TenantAdminDashboard,
+//     [RoleEnum.EMBEDDED_ENGINEER]: EmbeddedEngineerDashboard,
+//     [RoleEnum.OPERATOR]: OperatorDashboard,
+//     [RoleEnum.VIEWER]: ViewerDashboard,
+//   };
 
-  if (!user) {
-    return null;
-  }
+//   const role = user.role as RoleEnum;
 
-  const dashboardMap: Record<
-    string,
-    React.LazyExoticComponent<React.ComponentType>
-  > = {
-    PLATFORM_ADMIN: PlatformAdminDashboard,
-    TENANT_ADMIN: TenantAdminDashboard,
-    EMBEDDED_ENGINEER: EmbeddedEngineerDashboard,
-    OPERATOR: OperatorDashboard,
-    VIEWER: ViewerDashboard,
-  };
+//   const DashboardComponent = dashboardMap[role];
 
-  const roleName =
-    typeof user.role === 'string'
-      ? user.role
-      : user.role?.name || '';
+//   if (!DashboardComponent) {
+//     return <Navigate to="/auth/forbidden" replace />;
+//   }
 
-  const DashboardComponent = dashboardMap[roleName];
-
-  if (!DashboardComponent) {
-    return <Navigate to="/auth/forbidden" replace />;
-  }
-
-  return <DashboardComponent />;
-};
+//   return <DashboardComponent />;
+// };
 
 const AppRoutes = () => {
   return (
@@ -296,12 +294,12 @@ const AppRoutes = () => {
 
           <Route
             index
-            element={<RoleDashboard />}
+            element={<ViewerDashboard />}
           />
 
           <Route
             path="dashboard"
-            element={<RoleDashboard />}
+            element={<ViewerDashboard />}
           />
 
 

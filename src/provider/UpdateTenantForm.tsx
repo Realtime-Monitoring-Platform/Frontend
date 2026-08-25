@@ -215,7 +215,7 @@ const UpdateTenantForm = () => {
           render={({ field }) => (
             <div className="grid grid-cols-4 items-center gap-4">
               <FormLabel htmlFor="adminId" className="text-right">
-                Admin ID
+                Admin 
               </FormLabel>
               <FormControl>
                 <Select onValueChange={field.onChange} value={field.value}>

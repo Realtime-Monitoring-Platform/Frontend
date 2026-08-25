@@ -43,9 +43,9 @@ const TenantListPage = () => {
   } = useQuery({
     queryKey: ["tenants", currentPage, pageSize],
     queryFn: () => getAllTenants(currentPage, pageSize),
-    staleTime: 0,
-    refetchOnMount: "always",
+    
   });
+  console.log('Fetched tenants data:', tenants);
 
   const { onOpen } = useAddTenantModal();
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link, Navigate, redirect, Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,9 +19,9 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
- const LoginPage = () => {
+const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login,isAuthenticated } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,28 +33,33 @@ type LoginFormData = z.infer<typeof loginSchema>;
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: LoginFormData) => {
-    try {
-      setError(null);
-      console.log(data);
-      const loginResponse = await login(data);
-      if (loginResponse.first_login) {
-        navigate('/auth/change-password');
-      if(loginResponse.user.role === 'admin') {
-        navigate('/users');
-      }
-      } else {
-        console.log('Login successful for user:', data.email);
-        navigate('/users');
-      }
-    } catch (err) {
-      setError('Invalid username or password');
-    }
-  };
+  if(isAuthenticated){
+    console.log('User is already authenticated, redirecting to dashboard...');
+    redirect('/dashboard');
+  }
+const onSubmit = async (data: LoginFormData) => {
+  try {
+    setError(null);
 
+    const loginResponse = await login(data);
+
+    console.log('Login response:', loginResponse);
+
+    if (loginResponse.first_login) {
+      navigate('/auth/change-password', { replace: true });
+      return;
+    }
+
+    navigate('/dashboard', { replace: true });
+
+  } catch (err) {
+    console.error('Login error:', err);
+    setError('Invalid username or password');
+  }
+};
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      
+
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center text-2xl font-bold text-primary">
@@ -121,12 +126,12 @@ type LoginFormData = z.infer<typeof loginSchema>;
                   Remember me
                 </Label>
               </div> */}
-              <RouterLink
+              <Link
                 to="/auth/forgot-password"
                 className="text-sm text-primary hover:underline"
               >
                 Forgot password?
-              </RouterLink>
+              </Link>
             </div>
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>

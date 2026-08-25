@@ -1,5 +1,6 @@
 import { Pagination, Role, Tenant } from "@/types";
 import { api } from "./api";
+import axios from "axios";
 
 export const getAllTenantsd = async ():Promise<Pagination<Tenant>> =>{
     try {

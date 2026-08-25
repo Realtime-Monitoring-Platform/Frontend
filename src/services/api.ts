@@ -8,7 +8,7 @@ class ApiService {
 
   constructor() {
     this.client = axios.create({
-      baseURL: "http://localhost:8222/api/v1",
+      baseURL: API_BASE_URL,
       //authorization: `Bearer ${localStorage.getItem('access_token')}`,
       timeout: 30000,
       headers: {

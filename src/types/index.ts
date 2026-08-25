@@ -301,11 +301,18 @@ export interface LoginRequest {
   email: string;
   password: string;
 }
-
+export enum RoleEnum {
+  PLATFORM_ADMIN = 'PLATFORM_ADMIN',
+  TENANT_ADMIN = 'TENANT_ADMIN',
+  EMBEDDED_ENGINEER = 'EMBEDDED_ENGINEER',
+  OPERATOR = 'OPERATOR',
+  VIEWER = 'VIEWER',
+}
 export interface LoginResponse {
   access_token: string;
   refresh_token: string;
   first_login?: boolean;
+  role?: string;
   expiresIn: number;
   user: User;
 }
