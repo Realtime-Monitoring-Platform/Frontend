@@ -36,6 +36,8 @@ import { getTenantList } from "@/services/tenantAction";
 import { getTeamList } from "@/services/teamsAction";
 import { createDevice } from "@/services/deviceAction";
 import { useAuth } from "@/hooks/useAuth";
+import useShowDeviceResult from "@/hooks/useShowDeviceResult";
+import { DeviceResponse } from "@/types";
 
 const formSchema = z.object({
   deviceName: z.string().min(1, "Device name is required"),
@@ -60,7 +62,7 @@ const AddDeviceForm = () => {
     }
   });
   const { onClose } = useAddDeviceModal();
-
+  const { onOpen:openDeviceDetails, setDevice } = useShowDeviceResult();
   const { data: users = [] } = useQuery({
     queryKey: ["users"],
     queryFn: getUsersList,
@@ -83,9 +85,9 @@ const AddDeviceForm = () => {
       console.log("Creating device...");
     },
 
-    onSuccess: async (data) => {
+    onSuccess: async (data:DeviceResponse) => {
       console.log("Device created:", data);
-
+      
       toast.success("Device created successfully");
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -98,6 +100,8 @@ const AddDeviceForm = () => {
 
       form.reset();
       onClose();
+      setDevice(data); 
+      openDeviceDetails();
     },
 
     onError: (error) => {

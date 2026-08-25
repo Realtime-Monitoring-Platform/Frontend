@@ -29,12 +29,12 @@ import { useAuth } from '../../../hooks/useAuth';
         {/* Profile Card */}
         <Card>
           <CardContent className="pt-6 text-center">
-            <Avatar className="mx-auto mb-4 h-24 w-24">
+            {/* <Avatar className="mx-auto mb-4 h-24 w-24">
               <AvatarFallback className="bg-primary text-4xl text-primary-foreground">
                 {user.firstName}
                 {user.lastName}
               </AvatarFallback>
-            </Avatar>
+            </Avatar> */}
             <h2 className="text-xl font-semibold">
               {user.firstName} {user.lastName}
             </h2>

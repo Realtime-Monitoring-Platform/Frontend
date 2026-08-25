@@ -297,6 +297,21 @@ export interface ApiError {
   details?: Record<string, any>;
 }
 
+export interface DeviceResponse {
+
+  id: string,
+  tenantId: string,
+  teamId: string,
+  assignedUserId: string,
+  deviceName: string,
+  status: string,
+  lastSeen: string,
+  deviceToken: string,
+  createdAt: string,
+  updatedAt: string
+
+}
+
 export interface LoginRequest {
   email: string;
   password: string;

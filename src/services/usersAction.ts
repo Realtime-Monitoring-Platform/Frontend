@@ -34,7 +34,15 @@ export const getUsersList = async ():Promise<User[]> =>{
     }
 }
 
-
+export const updatEMyProfile = async (data: Partial<User>): Promise<User> => {
+    try {
+        const response = await api.put('/users/updateMyProfile', data);
+        console.log(response);
+        return response.data;
+    } catch (error) {
+        throw new Error('Failed to update profile');
+    }
+}
 
 export const getUsersByTenantId =  async (tenantId: string, page = 0, size = 10):Promise<Pagination<User>> =>{
     try {

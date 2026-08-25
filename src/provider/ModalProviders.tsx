@@ -1,6 +1,7 @@
 
 import { Spinner } from "@/components/ui/spinner";
 import { lazy, Suspense } from "react";
+import ShowDeviceResult from "./ShowDeviceResult";
 
 
 
@@ -25,6 +26,7 @@ const ModalProviders = () => {
       <UpdateTenantModal />
       <AddPermissionModal />
       <UpdateDeviceModal />
+      <ShowDeviceResult />
       <AddDeviceModal />
       <UpdateUserModal />
       <UpdateRoleModal />

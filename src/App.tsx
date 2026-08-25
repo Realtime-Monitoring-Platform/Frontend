@@ -294,12 +294,12 @@ const AppRoutes = () => {
 
           <Route
             index
-            element={<ViewerDashboard />}
+            element={<MonitoringPage />}
           />
 
           <Route
             path="dashboard"
-            element={<ViewerDashboard />}
+            element={<MonitoringPage />}
           />
 
 
