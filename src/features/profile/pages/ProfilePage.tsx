@@ -74,6 +74,10 @@ import { useAuth } from '../../../hooks/useAuth';
                   <Label htmlFor="username">Username</Label>
                   <Input id="username" defaultValue={user.username} readOnly />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input id="phone" defaultValue={user.phone} readOnly />
+                </div>
               </div>
               <div className="mt-6">
                 <Button>Update Profile</Button>
