@@ -60,12 +60,14 @@ const DeviceDetailsPage = () => {
           <p className="text-sm text-muted-foreground">{deviceDetails?.model || 'No model specified'}</p>
         </div>
         <div className="flex gap-2">
+          {/* 
           <Button variant="outline" onClick={() => navigate(`/devices/${id}/edit`)}>
             Edit
           </Button>
           <Button onClick={() => navigate(`/devices/${id}/commands`)}>
             Send Command
-          </Button>
+          </Button> 
+          */}
         </div>
       </div>
 

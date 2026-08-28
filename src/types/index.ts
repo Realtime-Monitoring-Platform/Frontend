@@ -38,7 +38,7 @@ export interface User {
   teamId?: string;
   roleId?: string;
   roleName?: string;
-
+  userId?: string;
   tenantId?: string;
   tenantName?: string;
   lastLogin?: string;

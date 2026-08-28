@@ -1,9 +1,17 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { User, LoginRequest, LoginResponse } from '@/types';
-import { api } from '../services/api';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { toast } from 'react-hot-toast';
-import { redirect } from 'react-router-dom';
+
+import { User, LoginRequest, LoginResponse } from '@/types';
+import { api } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
@@ -20,88 +28,128 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const [, setCookie] = useCookies(['access_token', 'refresh_Token']);
+
   const [isFirstLogin, setIsFirstLogin] = useState(false);
-  const [, setCookie] = useCookies(['refresh_Token', 'access_token']);
 
+  /**
+   * Get token before executing the query.
+   */
+  const token = localStorage.getItem('access_token');
 
+  /**
+   * Configure Authorization header when token exists.
+   */
   useEffect(() => {
-    const initAuth = async () => {
-      const token = localStorage.getItem('access_token');
-      if (token) {
-        try {
-          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          const response = await api.get('/auth/me');
-          console.log('Fetched user data:', response.data);
-          setUser(response.data);
-        } catch {
-         // localStorage.removeItem('access_token');
-          //localStorage.removeItem('refresh_token');
+    if (token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+      delete api.defaults.headers.common['Authorization'];
+    }
+  }, [token]);
+
+  /**
+   * Fetch current authenticated user.
+   */
+  const {
+    data: user = null,
+    isLoading,
+    isError,
+  } = useQuery<User>({
+    queryKey: ['auth', 'me'],
+    queryFn: async () => {
+      const { data } = await api.get<User>('/auth/me');
+
+      console.log('Fetched user data:', data);
+
+      return data;
+    },
+    enabled: !!token,
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  /**
+   * If /auth/me fails, the token is probably invalid/expired.
+   */
+  useEffect(() => {
+    if (isError) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+
+      delete api.defaults.headers.common['Authorization'];
+
+      queryClient.removeQueries({
+        queryKey: ['auth', 'me'],
+      });
+    }
+  }, [isError, queryClient]);
+
+  const login = async (
+    credentials: LoginRequest
+  ): Promise<LoginResponse> => {
+    try {
+      const { data } = await api.post<LoginResponse>(
+        '/auth/authenticate',
+        {
+          email: credentials.email,
+          password: credentials.password,
         }
-      }
-      setIsLoading(false);
-    };
+      );
 
-    initAuth();
-  }, []);
+      const {
+        access_token,
+        refresh_token,
+        first_login,
+      } = data;
 
-  const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
-  try {
-    const { data } = await api.post<LoginResponse>(
-      '/auth/authenticate',
-      {
-        email: credentials.email,
-        password: credentials.password,
-      }
-    );
+      console.log('Login successful:', data);
 
-    const {
-      access_token,
-      refresh_token,
-      first_login,
-    } = data;
+      /**
+       * Save tokens.
+       */
+      setCookie('access_token', access_token, {
+        path: '/',
+      });
 
-    console.log('Login successful:', data);
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
 
-    setCookie('access_token', access_token, { path: '/' });
-    localStorage.setItem('access_token', access_token);
-    localStorage.setItem('refresh_token', refresh_token);
+      /**
+       * Update axios immediately.
+       */
+      api.defaults.headers.common['Authorization'] =
+        `Bearer ${access_token}`;
 
-  
-    setIsFirstLogin(first_login === true);
+      setIsFirstLogin(first_login === true);
 
-    toast.success(first_login ? 'Welcome! Please complete your profile.' : 'Welcome back!');
-    console.log('Redirecting to dashboard...');
-    redirect('/dashboard');
-    return data;
-  } catch (error) {
-    toast.error('Login failed. Please check your credentials.');
-    throw error;
-  }
-};
-  // const login = async (credentials: LoginRequest) => {
-  //   try {
-  //     const response = await api.post<LoginResponse>('/auth/authenticate', {
-  //       email: credentials.email,
-  //       password: credentials.password,
-  //     });
-  //     const { access_token, refresh_token, first_login } = response.data;
-  //     console.log('Login successful:', response.data);
-  //     setCookie('access_token', access_token, { path: '/' });
-  //     setCookie('refresh_Token', refresh_token, { path: '/' });
-  //     localStorage.setItem('access_token', access_token);
-  //     localStorage.setItem('refresh_token', refresh_token);
+      /**
+       * Fetch /auth/me again after login.
+       */
+      await queryClient.invalidateQueries({
+        queryKey: ['auth', 'me'],
+      });
 
-  //     setIsFirstLogin(first_login === true);
+      toast.success(
+        first_login
+          ? 'Welcome! Please complete your profile.'
+          : 'Welcome back!'
+      );
 
-  //     toast.success(`Welcome back!`);
-  //     return first_login === true;
-  //   } catch (error) {
-  //     toast.error('Login failed. Please check your credentials.');
-  //     throw error;
-  //   }
-  // };
+      navigate('/dashboard');
+
+      return data;
+    } catch (error) {
+      toast.error(
+        'Login failed. Please check your credentials.'
+      );
+
+      throw error;
+    }
+  };
 
   const completeFirstLogin = () => {
     setIsFirstLogin(false);
@@ -110,26 +158,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    setUser(null);
+
+    setCookie('access_token', '', {
+      path: '/',
+      maxAge: 0,
+    });
+
+    delete api.defaults.headers.common['Authorization'];
+
+    /**
+     * Remove authenticated user from React Query cache.
+     */
+    queryClient.removeQueries({
+      queryKey: ['auth', 'me'],
+    });
+
     setIsFirstLogin(false);
+
     toast.success('Logged out successfully');
+
+    navigate('/login');
   };
 
   const hasRole = (role: string): boolean => {
     if (!user) return false;
-    const roleName = typeof user.role === 'string' ? user.role : user.role?.name;
+
+    const roleName =
+      typeof user.role === 'string'
+        ? user.role
+        : user.role?.name;
+
     return roleName === role;
   };
 
   const hasPermission = (permission: string): boolean => {
     if (!user) return false;
+
     return (user.permissions ?? []).includes(permission);
   };
 
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
-    isLoading,
+    isLoading: !!token && isLoading,
     isFirstLogin,
     login,
     logout,
@@ -147,8 +218,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+
+  if (!context) {
+    throw new Error(
+      'useAuth must be used within an AuthProvider'
+    );
   }
+
   return context;
 };

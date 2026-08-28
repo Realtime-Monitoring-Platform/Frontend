@@ -550,16 +550,17 @@ const AppRoutes = () => {
 
 const App = () => {
   return (
-    <Router>
+    <Router><QueryProvider>
       <CookiesProvider>
         <AuthProvider>
-          <QueryProvider>
-            <ToastProviders />
-            <ModalProviders />
-            <AppRoutes />
-          </QueryProvider>
+
+          <ToastProviders />
+          <ModalProviders />
+          <AppRoutes />
+
         </AuthProvider>
       </CookiesProvider>
+    </QueryProvider>
     </Router>
   );
 };
