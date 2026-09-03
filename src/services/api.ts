@@ -1,11 +1,13 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { toast } from 'react-hot-toast';
 
-const API_BASE_URL = 'http://localhost:8222/api/v1';
+const API_BASE_URL = `${import.meta.env.VITE_BASE_API_URL || ''}/api/v1`;
 
 class ApiService {
   private client: AxiosInstance;
 
+
+  
   constructor() {
     this.client = axios.create({
       baseURL: API_BASE_URL,
@@ -42,12 +44,12 @@ class ApiService {
 
         if (error.response?.status === 401 && originalRequest) {
           // Token expired, try to refresh
-          const refresh_Token = localStorage.getItem('refresh_Token');
-          if (refresh_Token) {
+          const refreshToken = localStorage.getItem('refresh_token');
+          if (refreshToken) {
             try {
 
-              const response = await axios.post(`'http://localhost:8222/api/v1/auth/refresh-token`, {
-                refresh_Token,
+              const response = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {
+                refresh_token: refreshToken,
               });
               const { access_token } = response.data;
               localStorage.setItem('access_token', access_token);
@@ -59,11 +61,11 @@ class ApiService {
               // Refresh failed, redirect to login
            //   localStorage.removeItem('access_token');
              // localStorage.removeItem('refresh_Token');
-              window.location.href = '/auth/authenticate';
+              window.location.href = '/auth/login';
             }
           } else {
             // No refresh token, redirect to login
-            window.location.href = '/auth/authenticate';
+            window.location.href = '/auth/login';
           }
         }
 

@@ -4,7 +4,11 @@ dist-ssr
 *.local
 .env
 .env.local
+# VITE_* values are passed explicitly as Docker build args; do not let
+# per-environment .env files (e.g. .env.production) sneak into the image.
+.env.*
 *.log
+
 npm-debug.log*
 .vscode
 .idea

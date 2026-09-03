@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useCallback, KeyboardEvent } from "react";
+const API_BASE = "/api/v1/devices";
 
-
-const API_BASE = "http://localhost:8222/api/v1/devices";
 const POLL_INTERVAL_MS = 1000;
 const POLL_TIMEOUT_MS = 30000;
+
 
 type CommandStatus = "PENDING" | "SENT" | "COMPLETED" | "SUCCESS" | "FAILED";
 

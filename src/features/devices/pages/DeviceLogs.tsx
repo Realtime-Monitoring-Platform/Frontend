@@ -6,8 +6,11 @@ interface DeviceLogsProps {
     deviceId: string;
 }
 
-const MAX_LINES = 1000; 
 
+const MAX_LINES = 1000; 
+// Same-origin API by default: browser -> nginx (/api) -> gateway.
+// An absolute URL is baked in only when VITE_BASE_API_URL is set (build arg).
+const Base_URL = import.meta.env.VITE_BASE_API_URL || "";
 const DeviceLogs = ({ deviceId }: DeviceLogsProps) => {
     const [lines, setLines] = useState<DeviceLogEvent[]>([]);
     const [autoScroll, setAutoScroll] = useState(true);
@@ -27,7 +30,7 @@ const DeviceLogs = ({ deviceId }: DeviceLogsProps) => {
         const connectSSE = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:8222/api/v1/devices/${deviceId}/logs/stream`,
+                    `${Base_URL}/api/v1/devices/${deviceId}/logs/stream`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
