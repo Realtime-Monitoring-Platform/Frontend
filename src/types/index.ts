@@ -59,6 +59,24 @@ export interface Role {
   isSystemRole: boolean;
   createdAt: string;
 }
+export interface AiRecommendation {
+  priority: number;
+  action: string;
+  command?: string;
+}
+
+export interface AiIncident {
+  incidentId: string;
+  deviceId: string;
+  tenantId: string;
+  severity: string;
+  problem: string;
+  rootCause: string;
+  confidence: number;
+  impact: string;
+  recommendations: AiRecommendation[];
+  createdAt: string;
+}
 
 export interface Permission {
   id: string;
