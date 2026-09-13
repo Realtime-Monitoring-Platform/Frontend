@@ -3,71 +3,125 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Spinner } from '@/components/ui/spinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import DeviceTerminal from '@/components/Deviceterminal';
 import DeviceLogs from './DeviceLogs';
 import DeviceMetrics from './DeviceMetrics';
 import { useQuery } from '@tanstack/react-query';
 import { getDeviceById } from '@/services/deviceAction';
 import { getAnalyzeBYdEVICEiD } from '@/services/AiAnalyze';
-import { AiIncident } from '@/types';
+import { AiIncident, Pagination as PaginationType } from '@/types';
+import { useState } from 'react';
+import { Field, FieldLabel } from "@/components/ui/field"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { getSeverityStyle, getStatusStyle } from '@/lib/utils';
+import { InfoRow, InfoRowMono, SectionLabel, Spec } from './utils';
 
 
 
-const STATUS_STYLES: Record<string, { dot: string; text: string; label: string }> = {
-  ACTIVE: { dot: 'bg-emerald-500', text: 'text-emerald-700', label: 'Active' },
-  ONLINE: { dot: 'bg-emerald-500', text: 'text-emerald-700', label: 'Online' },
-  INACTIVE: { dot: 'bg-slate-400', text: 'text-slate-600', label: 'Inactive' },
-  OFFLINE: { dot: 'bg-slate-400', text: 'text-slate-600', label: 'Offline' },
-  ERROR: { dot: 'bg-red-500', text: 'text-red-700', label: 'Error' },
-  DEGRADED: { dot: 'bg-amber-500', text: 'text-amber-700', label: 'Degraded' },
+const IncidentSummary = ({
+  incident,
+  expanded,
+  onToggle,
+}: {
+  incident: AiIncident;
+  expanded?: boolean;
+  onToggle?: () => void;
+}) => {
+  const severity = getSeverityStyle(incident.severity);
+
+  return (
+    <div className={`rounded-md border border-l-4 ${severity.border} bg-card`}>
+      <Button
+        type="button"
+        variant="ghost"
+        className="h-auto w-full justify-between gap-4 rounded-md p-4 text-left hover:bg-muted/40"
+        aria-expanded={expanded}
+        onClick={onToggle}
+      >
+        <span className="flex min-w-0 items-start gap-3">
+          <AlertTriangle className={`mt-0.5 h-4 w-4 shrink-0 ${severity.text}`} />
+          <span className="min-w-0">
+            <span className="block truncate font-medium">{incident.problem}</span>
+            <span className="block text-xs text-muted-foreground">
+              {new Date(incident.createdAt).toLocaleString()}
+            </span>
+          </span>
+        </span>
+        <span className="flex shrink-0 items-center gap-3">
+          <span className={`flex items-center gap-1.5 text-xs font-semibold ${severity.text}`}>
+            <span className={`h-1.5 w-1.5 rounded-full ${severity.dot}`} />
+            {incident.severity}
+          </span>
+          <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+        </span>
+      </Button>
+      {/* {expanded && <div className="border-t border-border p-4"><IncidentDetails incident={incident} /></div>} */}
+      {expanded &&
+        <div className={`space-y-4 rounded-md  ${severity.border}  p-4`}>
+          
+
+          <div className="grid gap-4 border-t border-border pt-3 md:grid-cols-3">
+            <div>
+              <p className="text-[11px] font-medium text-muted-foreground">Root cause</p>
+              <p className="mt-1 text-sm">{incident.rootCause}</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-medium text-muted-foreground">Impact</p>
+              <p className="mt-1 text-sm">{incident.impact}</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-medium text-muted-foreground">Confidence</p>
+              <p className="mt-1 text-sm font-semibold">{Math.round(incident.confidence * 100)}%</p>
+            </div>
+          </div>
+
+          <div className="border-t border-border pt-3">
+            <p className="mb-2 text-[11px] font-medium text-muted-foreground">Recommended actions, in order</p>
+            <ol className="space-y-2">
+              {incident.recommendations
+                .slice()
+                .sort((a, b) => a.priority - b.priority)
+                .map((recommendation) => (
+                  <li
+                    key={`${incident.incidentId}-${recommendation.priority}`}
+                    className="flex gap-3 rounded-md bg-muted/40 p-3"
+                  >
+                    <span className="mt-0.5 shrink-0 rounded-md bg-background px-2 py-1 text-xs font-semibold text-muted-foreground">
+                      {recommendation.priority}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">{recommendation.action}</p>
+                      {recommendation.command && (
+                        <code className="mt-2 block overflow-x-auto rounded bg-background px-2 py-1 font-mono text-xs">
+                          {recommendation.command}
+                        </code>
+                      )}
+                    </div>
+                  </li>
+                ))}
+            </ol>
+          </div>
+        </div>
+      }
+    </div>
+
+  );
 };
-
-const getStatusStyle = (status?: string) =>
-  STATUS_STYLES[(status || '').toUpperCase()] ?? {
-    dot: 'bg-amber-500',
-    text: 'text-amber-700',
-    label: status || 'Unknown',
-  };
-
-const SEVERITY_STYLES: Record<string, { border: string; dot: string; text: string }> = {
-  CRITICAL: { border: 'border-l-red-500', dot: 'bg-red-500', text: 'text-red-700' },
-  HIGH: { border: 'border-l-orange-500', dot: 'bg-orange-500', text: 'text-orange-700' },
-  MEDIUM: { border: 'border-l-amber-500', dot: 'bg-amber-500', text: 'text-amber-700' },
-  LOW: { border: 'border-l-slate-400', dot: 'bg-slate-400', text: 'text-slate-600' },
-};
-
-const getSeverityStyle = (severity: string) =>
-  SEVERITY_STYLES[severity.toUpperCase()] ?? SEVERITY_STYLES.LOW;
-
-
-const Spec = ({ label, value }: { label: string; value?: string | number | null }) => (
-  <div className="min-w-0">
-    <p className="text-[11px] font-medium text-muted-foreground">{label}</p>
-    <p className="mt-0.5 truncate font-mono text-sm text-foreground">{value || '—'}</p>
-  </div>
-);
-
-const InfoRow = ({ label, value }: { label: string; value?: string | number | null }) => (
-  <div className="flex items-baseline justify-between gap-4 py-1.5 text-sm">
-    <span className="text-muted-foreground">{label}</span>
-    <span className="truncate text-right font-medium">{value ?? 'N/A'}</span>
-  </div>
-);
-
-const InfoRowMono = ({ label, value }: { label: string; value?: string | number | null }) => (
-  <div className="flex items-baseline justify-between gap-4 py-1.5 text-sm">
-    <span className="text-muted-foreground">{label}</span>
-    <span className="truncate text-right font-mono text-[13px]">{value || 'N/A'}</span>
-  </div>
-);
-
-const SectionLabel = ({ children }: { children: React.ReactNode }) => (
-  <h3 className="mb-1 text-sm font-semibold text-foreground">{children}</h3>
-);
 
 
 const DeviceDetailsPage = () => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [expandedIncidentId, setExpandedIncidentId] = useState<string | null>(null);
   const { id } = useParams();
   const { data: deviceDetails } = useQuery({
     queryKey: ['deviceDetails', id],
@@ -76,14 +130,28 @@ const DeviceDetailsPage = () => {
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  const aiAnalysisQuery = useQuery<AiIncident[]>({
-    queryKey: ['deviceAiAnalysis', id],
-    queryFn: () => getAnalyzeBYdEVICEiD(id || ''),
-    enabled: Boolean(id),
-    staleTime: 60 * 1000,
-  });
+  // const aiAnalysisQuery = useQuery<PaginationType<AiIncident>>({
+  //   queryKey: ['deviceAiAnalysis', id],
+  //   queryFn: () => { return getAnalyzeBYdEVICEiD(id || '', currentPage, pageSize); },
+  //   enabled: Boolean(id),
+  //   staleTime: 60 * 1000,
+  // });
+  const { data: aiAnalysisQuery, isLoading: aiAnalysisQueryisLoading, error: aiAnalysisQueryError } = useQuery<PaginationType<AiIncident>>({
+    queryKey: ["deviceAiAnalysis", id, currentPage, pageSize],
+    queryFn: () => { return getAnalyzeBYdEVICEiD(id || '', currentPage, pageSize); },
 
+    staleTime: 0,
+    refetchOnMount: "always",
+    enabled: Boolean(id),
+  });
   const status = getStatusStyle(deviceDetails?.status);
+  const incidents = aiAnalysisQuery?.content
+    ? [...aiAnalysisQuery.content].sort(
+      (first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime(),
+    )
+    : [];
+  const latestIncident = currentPage === 0 ? incidents[0] : undefined;
+  const historyIncidents = currentPage === 0 ? incidents.slice(1) : incidents;
 
   return (
     <div className="space-y-6">
@@ -290,20 +358,47 @@ const DeviceDetailsPage = () => {
             </Card>
           </TabsContent>
 
+
           <TabsContent value="ai">
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center
+               justify-between">
+
                 <CardTitle>AI analysis</CardTitle>
+                <div className="flex  items-center justify-between gap-4">
+                  <Field orientation="horizontal" className="w-fit">
+                    <FieldLabel htmlFor="select-rows-per-page">Rows per page</FieldLabel>
+                    <Select defaultValue="10" onValueChange={(value) => {
+                      setPageSize(parseInt(value, 10));
+                      setCurrentPage(0); // Reset to first page when page size changes
+                    }}>
+                      <SelectTrigger className="w-20" id="select-rows-per-page">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent align="start">
+                        <SelectGroup>
+                          <SelectItem value="1">1</SelectItem>
+                          <SelectItem value="10">10</SelectItem>
+                          <SelectItem value="25">25</SelectItem>
+                          <SelectItem value="50">50</SelectItem>
+                          <SelectItem value="100">100</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+
+                </div>
               </CardHeader>
+
               <CardContent>
-                {aiAnalysisQuery.isLoading && (
+                {aiAnalysisQueryisLoading && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Spinner className="h-4 w-4" />
                     Analyzing device history…
                   </div>
                 )}
 
-                {aiAnalysisQuery.isError && (
+                {aiAnalysisQueryError && (
                   <Alert variant="destructive">
                     <AlertDescription>
                       Couldn't load AI analysis for this device. Try refreshing the page.
@@ -311,94 +406,110 @@ const DeviceDetailsPage = () => {
                   </Alert>
                 )}
 
-                {!aiAnalysisQuery.isLoading && !aiAnalysisQuery.isError && aiAnalysisQuery.data?.length === 0 && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                    No incidents detected — this device is behaving normally.
-                  </div>
-                )}
+                {!aiAnalysisQueryisLoading &&
+                  !aiAnalysisQueryError &&
+                  aiAnalysisQuery?.content?.length === 0 && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                      No incidents detected — this device is behaving normally.
+                    </div>
+                  )}
 
-                {!aiAnalysisQuery.isLoading &&
-                  !aiAnalysisQuery.isError &&
-                  aiAnalysisQuery.data &&
-                  aiAnalysisQuery.data.length > 0 && (
+                {!aiAnalysisQueryisLoading &&
+                  !aiAnalysisQueryError &&
+                  aiAnalysisQuery?.content &&
+                  aiAnalysisQuery.content.length > 0 && (
                     <div className="space-y-4">
-                      {aiAnalysisQuery.data.map((incident) => {
-                        const severity = getSeverityStyle(incident.severity);
-                        return (
-                          <div
-                            key={incident.incidentId}
-                            className={`space-y-4 rounded-md border border-l-4 ${severity.border} bg-card p-4`}
-                          >
-                            <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
-                              <div className="flex items-start gap-3">
-                                <AlertTriangle className={`mt-0.5 h-4 w-4 shrink-0 ${severity.text}`} />
-                                <div>
-                                  <h3 className="font-semibold leading-snug">{incident.problem}</h3>
-                                  <p className="text-xs text-muted-foreground">
-                                    Detected {new Date(incident.createdAt).toLocaleString()}
-                                  </p>
-                                </div>
-                              </div>
-                              <span className={`flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold ${severity.text}`}>
-                                <span className={`h-1.5 w-1.5 rounded-full ${severity.dot}`} />
-                                {incident.severity}
-                              </span>
-                            </div>
+                      {latestIncident && (
+                        <section aria-labelledby="latest-analysis-heading" className="space-y-2">
+                          <h2 id="latest-analysis-heading" className="text-sm font-semibold text-foreground">
+                        
+                            
+                          </h2>
+                          <IncidentSummary 
+                          expanded={expandedIncidentId === latestIncident.incidentId}
+                          onToggle={() => setExpandedIncidentId((currentId) =>
+                            currentId === latestIncident.incidentId ? null : latestIncident.incidentId,
+                          )}
+                           incident={latestIncident} />
+                        </section>
+                      )}
 
-                            <div className="grid gap-4 border-t border-border pt-3 md:grid-cols-3">
-                              <div>
-                                <p className="text-[11px] font-medium text-muted-foreground">Root cause</p>
-                                <p className="mt-1 text-sm">{incident.rootCause}</p>
-                              </div>
-                              <div>
-                                <p className="text-[11px] font-medium text-muted-foreground">Impact</p>
-                                <p className="mt-1 text-sm">{incident.impact}</p>
-                              </div>
-                              <div>
-                                <p className="text-[11px] font-medium text-muted-foreground">Confidence</p>
-                                <p className="mt-1 text-sm font-semibold">
-                                  {Math.round(incident.confidence * 100)}%
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="border-t border-border pt-3">
-                              <p className="mb-2 text-[11px] font-medium text-muted-foreground">
-                                Recommended actions, in order
-                              </p>
-                              <ol className="space-y-2">
-                                {incident.recommendations
-                                  .slice()
-                                  .sort((a, b) => a.priority - b.priority)
-                                  .map((recommendation) => (
-                                    <li
-                                      key={`${incident.incidentId}-${recommendation.priority}`}
-                                      className="flex gap-3 rounded-md bg-muted/40 p-3"
-                                    >
-                                      <span className="mt-0.5 shrink-0 text-sm font-semibold text-muted-foreground">
-                                        {recommendation.priority}
-                                      </span>
-                                      <div className="min-w-0 flex-1">
-                                        <p className="text-sm font-medium">{recommendation.action}</p>
-                                        {recommendation.command && (
-                                          <code className="mt-2 block overflow-x-auto rounded bg-background px-2 py-1 font-mono text-xs">
-                                            {recommendation.command}
-                                          </code>
-                                        )}
-                                      </div>
-                                    </li>
-                                  ))}
-                              </ol>
-                            </div>
+                      {historyIncidents.length > 0 && (
+                        <section aria-labelledby="analysis-history-heading" className="space-y-2">
+                          <h2 id="analysis-history-heading" className="text-sm font-semibold text-foreground">
+                            
+                          </h2>
+                          <div className="space-y-2">
+                            {historyIncidents.map((incident) => (
+                              <IncidentSummary
+                                key={incident.incidentId}
+                                incident={incident}
+                                expanded={expandedIncidentId === incident.incidentId}
+                                onToggle={() => setExpandedIncidentId((currentId) =>
+                                  currentId === incident.incidentId ? null : incident.incidentId,
+                                )}
+                              />
+                            ))}
                           </div>
-                        );
-                      })}
+                        </section>
+                      )}
+
+                      {/* Pagination */}
+                      {aiAnalysisQuery.totalPages > 1 && (
+                        <div className="flex items-center justify-center gap-2 border-t border-border pt-4">
+                          <button
+                            type="button"
+                            disabled={aiAnalysisQuery.first}
+                            onClick={() =>
+                              setCurrentPage((page) => page - 1)
+                            }
+                            className="rounded-md border px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            Previous
+                          </button>
+
+                          {Array.from(
+                            { length: aiAnalysisQuery.totalPages },
+                            (_, index) => index
+                          ).map((page) => (
+                            <button
+                              key={page}
+                              type="button"
+                              onClick={() => setCurrentPage(page)}
+                              className={`rounded-md border px-3 py-1.5 text-sm ${aiAnalysisQuery.number === page
+                                ? "bg-primary text-primary-foreground"
+                                : ""
+                                }`}
+                            >
+                              {page + 1}
+                            </button>
+                          ))}
+
+                          <button
+                            type="button"
+                            disabled={aiAnalysisQuery.last}
+                            onClick={() =>
+                              setCurrentPage((page) => page + 1)
+                            }
+                            className="rounded-md border px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
               </CardContent>
+
+
+
             </Card>
+
+
           </TabsContent>
+
+
         </div>
       </Tabs>
     </div>
