@@ -10,13 +10,16 @@ export const Layout = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  
   const handleSidebarClose = () => {
     setSidebarOpen(false);
   };
 
   return (
     <div className="flex">
-       <Sidebar open={sidebarOpen} onClose={handleSidebarClose} /> 
+   
+       <Sidebar  open={sidebarOpen} onClose={handleSidebarClose} /> 
+      
       <main
         className="flex-1 bg-background min-h-screen"
         style={{ width: 'calc(100% - 260px)' }}

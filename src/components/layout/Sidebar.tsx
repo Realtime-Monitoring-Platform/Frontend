@@ -120,84 +120,85 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
   //   user?.roles.some((role) => item.roles.includes(role.name as UserRole))
   // );
 
-  const filteredItems = sidebarItems.filter((item)=>{
-    if(user?.permissions?.includes(item.permission ?? '')) {
+  const filteredItems = sidebarItems.filter((item) => {
+    if (user?.permissions?.includes(item.permission ?? '')) {
       return true;
     }
   })
 
+  
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   const sidebarContent = (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between p-4">
-        <h2 className="text-lg font-semibold text-primary">IoT Platform</h2>
-        {isMobile && (
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-      <Separator />
+    <div className="fixed w-0 md:w-64 lg:w-64 h-full">
+      <div className="flex border-r  h-full flex-col overflow-y-auto bg-card">
+        <div className="flex items-center justify-between p-4 h-16">
+          <h2 className="text-lg font-semibold text-primary">IoT Platform</h2>
+          {isMobile && (
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+        <Separator />
 
-      <nav className="flex-1 overflow-y-auto p-2">
-         {filteredItems.map((item) => (
-          <div key={item.label}>
-            <div
-              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium cursor-pointer transition-colors ${
-                item.path && location.pathname === item.path
+        <nav className=" flex-1 overflow-y-auto p-2 ">
+          {filteredItems.map((item) => (
+            <div key={item.label}>
+              <div
+                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium cursor-pointer transition-colors ${item.path && location.pathname === item.path
                   ? 'bg-primary text-primary-foreground'
                   : 'hover:bg-accent hover:text-accent-foreground'
-              }`}
-              onClick={() => item.path && handleNavigate(item.path)}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-              {item.children && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="ml-auto h-6 w-6 p-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToggle(item.label);
-                  }}
-                >
-                  {expandedItems.includes(item.label) ? (
-                    <ChevronUp className="h-3 w-3" />
-                  ) : (
-                    <ChevronDown className="h-3 w-3" />
-                  )}
-                </Button>
-              )}
-            </div>
+                  }`}
+                onClick={() => item.path && handleNavigate(item.path)}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+                {item.children && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="ml-auto h-6 w-6 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggle(item.label);
+                    }}
+                  >
+                    {expandedItems.includes(item.label) ? (
+                      <ChevronUp className="h-3 w-3" />
+                    ) : (
+                      <ChevronDown className="h-3 w-3" />
+                    )}
+                  </Button>
+                )}
+              </div>
 
-            {item.children && expandedItems.includes(item.label) && (
-              <div className="ml-6 mt-1 space-y-1">
-                {item.children.map((child) => (
-                  <div
-                    key={child.label}
-                    className={`rounded-md px-3 py-2 text-sm font-medium cursor-pointer transition-colors ${
-                      child.path && location.pathname === child.path
+              {item.children && expandedItems.includes(item.label) && (
+                <div className="ml-6 mt-1 space-y-1">
+                  {item.children.map((child) => (
+                    <div
+                      key={child.label}
+                      className={`rounded-md px-3 py-2 text-sm font-medium cursor-pointer transition-colors ${child.path && location.pathname === child.path
                         ? 'bg-primary text-primary-foreground'
                         : 'hover:bg-accent hover:text-accent-foreground'
-                    }`}
-                    onClick={() => child.path && handleNavigate(child.path)}
-                  >
-                    {child.label}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))} 
-      </nav>
+                        }`}
+                      onClick={() => child.path && handleNavigate(child.path)}
+                    >
+                      {child.label}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </nav>
 
-      <Separator />
+        <Separator />
 
-      {/* <div className="p-4">
+        {/* <div className="p-4">
         <p className="text-xs text-muted-foreground">v1.0.0</p>
       </div> */}
+      </div>
     </div>
   );
 
@@ -211,9 +212,8 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
           />
         )}
         <div
-          className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ${
-            open ? 'translate-x-0' : '-translate-x-full'
-          }`}
+          className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-full'
+            }`}
         >
           {sidebarContent}
         </div>
@@ -223,9 +223,8 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
 
   return (
     <div
-      className={`flex-shrink-0 border-r bg-card transition-all duration-300 ${
-        open ? 'w-64' : 'w-0 overflow-hidden'
-      }`}
+      className={` flex-shrink-0 border-r bg-card transition-all duration-300 ${open ? 'w-64' : 'w-0 overflow-hidden'
+        }`}
     >
       {sidebarContent}
     </div>

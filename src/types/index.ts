@@ -63,7 +63,11 @@ export interface AiRecommendation {
   priority: number;
   action: string;
   command?: string;
+  execution_status?: 'PENDING' | 'WAITING_FOR_APPROVAL' | 'APPROVED' | 'SENT' | 'COMPLETED' | 'FAILED' | 'REJECTED';
+  execution_output?: string | null;
+  execution_error?: string | null;
 }
+
 
 export interface AiIncident {
   incidentId: string;
@@ -75,6 +79,10 @@ export interface AiIncident {
   confidence: number;
   impact: string;
   recommendations: AiRecommendation[];
+  problemStatus?: 'SOLVED' | 'NOT_SOLVED' | 'INCONCLUSIVE' | null;
+  verificationConfidence?: number | null;
+  verificationExplanation?: string | null;
+  verificationNextAction?: string | null;
   createdAt: string;
 }
 
@@ -486,7 +494,8 @@ export interface DeviceCommand {
   id: string;
   deviceId: string;
   tenantId: string;
-  userId: string;
+  userId: string | null;
+  aiGenerated?: boolean;
   command: string;
   status: CommandStatus;
   stdout: string | null;

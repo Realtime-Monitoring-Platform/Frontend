@@ -73,10 +73,11 @@ interface HeaderProps {
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const hasUnread = unreadNotificationsCount && unreadNotificationsCount > 0;
 
+  
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-30 flex h-14 items-center justify-between border-b bg-card px-4 shadow-sm"
-      style={{ width: 'calc(100% - 260px)', marginLeft: '260px' }}
+      className="fixed w-full top-0 left-0 right-0 z-30 flex h-16 items-center justify-between border-b backdrop-blur-sm px-4 shadow-sm"
+      style={{ width: 'calc(100% - 260px)', marginLeft: '256px' }}
     >
       {/* Mobile Sidebar Trigger Toggle */}
       {isMobile && (

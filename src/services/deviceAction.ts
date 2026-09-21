@@ -1,4 +1,4 @@
-import { Pagination, Device, createDeviceDto, DeviceResponse } from "@/types";
+import { Pagination, Device, createDeviceDto, DeviceResponse, DeviceCommand } from "@/types";
 import { api } from "./api";
 
 
@@ -67,6 +67,7 @@ export const getDeviceById = async (id: string): Promise<Device> => {
         throw new Error('Failed to fetch device');
     }   }
 
+    
 export const updateDevice = async (id: string, data: Partial<Device>): Promise<Device> => {
     try {
         const response = await api.put(`/devices/${id}`, data);
@@ -82,4 +83,9 @@ export const deleteDevice = async (id: string): Promise<void> => {
     } catch (error) {
         throw new Error('Failed to delete device');
     }
+};
+
+export const getDeviceCommandHistory = async (deviceId: string, page = 0, size = 10): Promise<Pagination<DeviceCommand>> => {
+    const response = await api.get(`/devices/${deviceId}/commands/history?page=${page}&size=${size}`);
+    return response.data;
 };

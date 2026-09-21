@@ -33,6 +33,7 @@ interface TerminalLine {
 
 interface DeviceTerminalProps {
   deviceId?: string;
+  tenantId?: string;
   authHeaders?: Record<string, string>;
 }
 
@@ -67,7 +68,8 @@ function StatusDot({ status }: { status: CommandStatus }) {
 
 export default function DeviceTerminal({
 
-  deviceId = ""
+  deviceId = "",
+  tenantId = ""
 }: DeviceTerminalProps) {
   const token = localStorage.getItem("access_token");
 
@@ -101,6 +103,7 @@ export default function DeviceTerminal({
 
         let res: Response;
         try {
+          //http://localhost:8222/api/v1/devices/56293322-b63e-4bcf-94f9-37ea0869b4d1/commands/tenant/df3e7ec3-938f-4496-9bc9-bcc4e8fc54e2
           //http://localhost:8222/api/v1/devices/3b1ae99f-dcab-4f31-9008-1af83dbcffe0/commands
           res = await fetch(`${API_BASE}/commands/${commandId}`, {
             headers: {
@@ -171,8 +174,11 @@ export default function DeviceTerminal({
       setBusy(true);
       try {
         const token = localStorage.getItem("access_token");
+           //http://localhost:8222/api/v1/devices/56293322-b63e-4bcf-94f9-37ea0869b4d1/commands/tenant/df3e7ec3-938f-4496-9bc9-bcc4e8fc54e2
+          //http://localhost:8222/api/v1/devices/3b1ae99f-dcab-4f31-9008-1af83dbcffe0/commands
+       
         //http://localhost:8222/api/v1/devices/3b1ae99f-dcab-4f31-9008-1af83dbcffe0/commands
-        const res = await fetch(`${API_BASE}/${deviceId}/commands`, {
+        const res = await fetch(`${API_BASE}/${deviceId}/commands/tenant/${tenantId}`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -350,6 +356,7 @@ export default function DeviceTerminal({
 
           return null;
         })}
+
 
         {/* live input line */}
         <div className="mt-[10px] flex items-center">

@@ -1,6 +1,6 @@
 export const lightTheme = {
   colors: {
-    primary: { main: '#1976d2', light: '#42a5f5', dark: '#1565c0' },
+    primary: { main: '#82C8E5', light: '#B9E2F1', dark: '#3F819C' },
     secondary: { main: '#dc004e', light: '#ff5983', dark: '#9a0036' },
     success: { main: '#2e7d32', light: '#4caf50', dark: '#1b5e20' },
     warning: { main: '#ed6c02', light: '#ff9800', dark: '#e65100' },
@@ -16,15 +16,16 @@ export const lightTheme = {
   shape: { borderRadius: 8 },
 };
 
+
 export const darkTheme = {
   colors: {
-    primary: { main: '#90caf9', light: '#e3f2fd', dark: '#42a5f5' },
+    primary: { main: '#82C8E5', light: '#B9E2F1', dark: '#3F819C' },
     secondary: { main: '#f48fb1', light: '#f8bbd0', dark: '#c2185b' },
     success: { main: '#81c784', light: '#a5d6a7', dark: '#66bb6a' },
     warning: { main: '#ffb74d', light: '#ffcc80', dark: '#ffa726' },
     info: { main: '#64b5f6', light: '#90caf9', dark: '#42a5f5' },
-    background: { default: '#121212', paper: '#1e1e1e' },
-    text: { primary: '#ffffff', secondary: '#b0b0b0' },
+    background: { default: '#071923', paper: '#0B2230' },
+    text: { primary: '#E8F5F8', secondary: '#A7C2CC' },
   },
   typography: lightTheme.typography,
   spacing: 8,
