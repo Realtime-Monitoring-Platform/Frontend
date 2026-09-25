@@ -104,7 +104,8 @@ const IncidentSummary = ({
                           <span className="rounded-full border border-border bg-background px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                             {recommendation.execution_status || 'PENDING'}
                           </span>
-                          {recommendation.execution_status === 'WAITING_FOR_APPROVAL' && onApprove && (
+                          
+                          {recommendation.execution_status !== 'COMPLETED' && onApprove && (
                             <Button
                               type="button"
                               size="sm"

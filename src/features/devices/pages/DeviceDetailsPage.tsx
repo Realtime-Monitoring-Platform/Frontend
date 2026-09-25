@@ -131,12 +131,15 @@ const DeviceDetailsPage = () => {
               Device monitoring
             </div>
             <div>
+              
               <h1 className="text-3xl font-semibold tracking-tight">
-            {deviceDetails?.deviceName || 'Device Details'}
+                {deviceDetails?.deviceName || 'Device Details'}
               </h1>
+              
               <p className="mt-1 text-sm text-muted-foreground">
-            {deviceDetails?.model || 'No model specified'}
+                {deviceDetails?.model || 'No model specified'}
               </p>
+
             </div>
           </div>
           <div className="relative grid grid-cols-2 gap-2 sm:flex sm:items-center">
@@ -173,13 +176,13 @@ const DeviceDetailsPage = () => {
                 <p className={`mt-0.5 truncate text-sm font-semibold ${status.text}`}>{status.label}</p>
               </div>
             </div>
-            <div className="px-5 py-4 sm:px-4 sm:py-0">
+           <div className="flex items-center px-5 py-4 sm:px-4 sm:py-0">
               <Spec label="Hostname" value={deviceDetails?.hostname} />
             </div>
-            <div className="px-5 py-4 sm:px-4 sm:py-0">
+            <div className="flex items-center px-5 py-4 sm:px-4 sm:py-0">
               <Spec label="IP address" value={deviceDetails?.ipAddress} />
             </div>
-            <div className="px-5 py-4 sm:px-4 sm:py-0">
+            <div className="flex items-center px-5 py-4 sm:px-4 sm:py-0">
               <Spec label="MAC address" value={deviceDetails?.macAddress} />
             </div>
           </div>
@@ -450,7 +453,7 @@ const DeviceDetailsPage = () => {
                   aiAnalysisQuery?.content &&
                   aiAnalysisQuery.content.length > 0 && (
                     <div className="space-y-4">
-                      {/* {latestIncident && (
+                       {latestIncident && (
                         <section aria-labelledby="latest-analysis-heading" className="space-y-2">
                           <h2 id="latest-analysis-heading" className="flex items-center gap-2 text-sm font-semibold text-foreground">
                             Latest analysis
@@ -462,12 +465,12 @@ const DeviceDetailsPage = () => {
                             )}
                             onApprove={(priority, command) => approveCommand(latestIncident, priority, command)}
                             approvingPriority={approvingPriority}
-                            approvedRecommendationKeys={approvedRecommendationKeys}
                             incident={latestIncident} />
                         </section>
-                      )} */}
+                      )} 
 
-                      {/* {historyIncidents.length > 0 && (
+
+                       {historyIncidents.length > 0 && (
                         <section aria-labelledby="analysis-history-heading" className="space-y-2">
                           <h2 id="analysis-history-heading" className="text-sm font-semibold text-foreground">
                             Earlier analyses
@@ -483,12 +486,11 @@ const DeviceDetailsPage = () => {
                                 )}
                                 onApprove={(priority, command) => approveCommand(incident, priority, command)}
                                 approvingPriority={approvingPriority}
-                                approvedRecommendationKeys={approvedRecommendationKeys}
                               />
                             ))}
                           </div>
                         </section>
-                      )} */}
+                      )} 
 
                       {/* Pagination */}
                       {aiAnalysisQuery.totalPages > 1 && (
