@@ -101,7 +101,7 @@ const UsersTable = ({ tenantId }: { tenantId: string }) => {
         setCurrentPage(next.pageIndex);
       }}
       totalElements={users?.totalElements || 0}
-      pageSizeOptions={[5, 10, 20, 50]}
+      pageSizeOptions={[1,2,5, 10, 20, 50]}
       onPageSizeChange={(size) => {
         setPageSize(size);
         setCurrentPage(0);
@@ -156,7 +156,7 @@ const TeamsTable = ({ tenantId }: { tenantId: string }) => {
         setCurrentPage(next.pageIndex);
       }}
       totalElements={teams?.totalElements || 0}
-      pageSizeOptions={[5, 10, 20, 50]}
+      pageSizeOptions={[1,2,5, 10, 20, 50]}
       onPageSizeChange={(size) => {
         setPageSize(size);
         setCurrentPage(0);
@@ -211,7 +211,7 @@ const DevicesTable = ({ tenantId }: { tenantId: string }) => {
         setCurrentPage(next.pageIndex);
       }}
       totalElements={devices?.totalElements || 0}
-      pageSizeOptions={[5, 10, 20, 50]}
+      pageSizeOptions={[1,2,5, 10, 20, 50]}
       onPageSizeChange={(size) => {
         setPageSize(size);
         setCurrentPage(0);

@@ -110,6 +110,9 @@ const DeviceDetailsPage = lazy(
   () => import('./features/devices/pages/DeviceDetailsPage')
 );
 
+const LandingPage= lazy(
+  () => import('./features/landing/Landing')
+)
 
 const AlertCenterPage = lazy(
   () => import('./features/alerts/pages/AlertCenterPage')
@@ -240,7 +243,11 @@ const AppRoutes = () => {
     <Suspense fallback={<PageLoader />}>
       <Routes>
 
+        <Route
+          path="/landing"
+          element={<LandingPage enterApp={() => {}} signIn={() => {}} />}
 
+        />
         <Route
           path="/auth/login"
           element={<LoginPage />}

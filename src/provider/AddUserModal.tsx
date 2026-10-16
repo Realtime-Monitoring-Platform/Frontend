@@ -13,8 +13,8 @@ const AddUserModal = () => {
     <Modal
       isOpen={isOpen}
       onChange={() => onClose()}
-      title="Ajouter un utilisateur"
-      description="Trouvez et mettez à jour vos utilisateurs en quelques clics"
+      title="Add User"
+      description="Add a new user to the system"
     >
       <AddUserForm />
     </Modal>

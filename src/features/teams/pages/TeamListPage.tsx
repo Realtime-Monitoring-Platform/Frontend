@@ -233,7 +233,7 @@ import { useAuth } from '@/hooks/useAuth';
               setCurrentPage(next.pageIndex);
             }}
             totalElements={teams?.totalElements || 0}
-            pageSizeOptions={[5, 10, 20, 50]}
+            pageSizeOptions={[1,2,5, 10, 20, 50]}
             onPageSizeChange={(size) => {
               setPageSize(size);
               setCurrentPage(0);

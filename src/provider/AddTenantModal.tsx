@@ -9,8 +9,8 @@ const AddTenantModal = () => {
   const { isOpen, onOpen, onClose } = useAddTenantModal();
   return (
     <Modal
-      title="Ajouter un tenant"
-      description="Créez un nouveau tenant pour votre organisation"
+      title="Add Tenant"
+      description="Add tenant to the system"
       isOpen={isOpen}
       onChange={onClose}
     >

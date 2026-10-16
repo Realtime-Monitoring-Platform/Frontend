@@ -31,7 +31,7 @@ import { getUserById } from '@/services/usersAction';
   }
 
   
-  const {onOpen}=useUpdateProfileModal();
+ // const {onOpen}=useUpdateProfileModal();
 
   if(isUserLoading || !userData){
     return(
@@ -108,7 +108,7 @@ import { getUserById } from '@/services/usersAction';
                 </div>
               </div>
               <div className="mt-6">
-                <Button onClick={onOpen}>Update Profile</Button>
+                {/* <Button onClick={onOpen}>Update Profile</Button> */}
               </div>
             </CardContent>
           </Card>

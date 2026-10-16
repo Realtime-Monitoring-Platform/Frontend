@@ -224,7 +224,7 @@ const TenantListPage = () => {
               setCurrentPage(next.pageIndex);
             }}
             totalElements={tenants?.totalElements || 0}
-            pageSizeOptions={[5, 10, 20, 50]}
+            pageSizeOptions={[1,2,5, 10, 20, 50]}
             onPageSizeChange={(size) => {
               setPageSize(size);
               setCurrentPage(0);

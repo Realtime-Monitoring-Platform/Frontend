@@ -105,7 +105,7 @@ const IncidentSummary = ({
                             {recommendation.execution_status || 'PENDING'}
                           </span>
                           
-                          {recommendation.execution_status !== 'COMPLETED' && onApprove && (
+                          {/* {recommendation.execution_status !== 'COMPLETED' && onApprove && (
                             <Button
                               type="button"
                               size="sm"
@@ -114,7 +114,7 @@ const IncidentSummary = ({
                             >
                               {approvingPriority === recommendation.priority ? 'Approving...' : 'Approve'}
                             </Button>
-                          )}
+                          )} */}
                         </div>
                       )}
                     </div>

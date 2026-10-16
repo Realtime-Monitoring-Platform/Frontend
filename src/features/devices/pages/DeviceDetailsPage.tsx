@@ -143,17 +143,7 @@ const DeviceDetailsPage = () => {
             </div>
           </div>
           <div className="relative grid grid-cols-2 gap-2 sm:flex sm:items-center">
-            <div className="rounded-lg border border-border/80 bg-background/70 px-3 py-2">
-              <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Device ID</p>
-              <p className="mt-1 max-w-[190px] truncate font-mono text-xs">{deviceDetails?.id || '—'}</p>
-            </div>
-            <div className="rounded-lg border border-border/80 bg-background/70 px-3 py-2">
-              <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Last seen</p>
-              <p className="mt-1 flex items-center gap-1.5 text-xs font-medium">
-                <Clock3 className="h-3.5 w-3.5 text-muted-foreground" />
-                {deviceDetails?.lastSeen ? new Date(deviceDetails.lastSeen).toLocaleString() : 'Never'}
-              </p>
-            </div>
+            
           </div>
         </div>
       </div>
@@ -229,7 +219,7 @@ const DeviceDetailsPage = () => {
                         <InfoRowMono label="Device ID" value={deviceDetails?.id} />
                         <InfoRow label="Device name" value={deviceDetails?.deviceName} />
                         <InfoRow label="Description" value={deviceDetails?.description || 'No description'} />
-                        <InfoRow label="Location" value={deviceDetails?.location} />
+                        {/* <InfoRow label="Location" value={deviceDetails?.location} /> */}
                         <InfoRowMono label="Device identifier" value={deviceDetails?.deviceIdentifier} />
                       </div>
                     </div>
@@ -237,8 +227,8 @@ const DeviceDetailsPage = () => {
                     <div>
                       <SectionLabel>Hardware</SectionLabel>
                       <div className="divide-y divide-border">
-                        <InfoRow label="Manufacturer" value={deviceDetails?.manufacturer} />
-                        <InfoRow label="Model" value={deviceDetails?.model} />
+                        {/* <InfoRow label="Manufacturer" value={deviceDetails?.manufacturer} /> */}
+                        {/* <InfoRow label="Model" value={deviceDetails?.model} /> */}
                         <InfoRow label="CPU count" value={deviceDetails?.cpuCount ?? undefined} />
                         <InfoRow
                           label="Total memory"
@@ -284,10 +274,10 @@ const DeviceDetailsPage = () => {
                     <div>
                       <SectionLabel>Timestamps</SectionLabel>
                       <div className="divide-y divide-border">
-                        <InfoRow
+                        {/* <InfoRow
                           label="Last seen"
                           value={deviceDetails?.lastSeen ? new Date(deviceDetails.lastSeen).toLocaleString() : 'Never'}
-                        />
+                        /> */}
                         <InfoRow
                           label="Created"
                           value={deviceDetails?.createdAt ? new Date(deviceDetails.createdAt).toLocaleString() : undefined}
