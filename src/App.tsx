@@ -122,6 +122,10 @@ const ReportsPage = lazy(
   () => import('./features/reports/pages/ReportsPage')
 );
 
+const NewAuth = lazy(
+  () => import('./features/newAuth')
+);
+
 
 const MonitoringPage = lazy(
   () => import('./features/monitoring/pages/MonitoringPage')
@@ -243,6 +247,12 @@ const AppRoutes = () => {
     <Suspense fallback={<PageLoader />}>
       <Routes>
 
+
+        <Route
+          path="/newauth"
+          element={<NewAuth enterApp={() => {}} back={() => {}} />}
+
+        />
         <Route
           path="/landing"
           element={<LandingPage enterApp={() => {}} signIn={() => {}} />}

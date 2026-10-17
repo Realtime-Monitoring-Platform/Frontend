@@ -1,16 +1,15 @@
 import { useState } from 'react';
-import { Link, Navigate, redirect, Link as RouterLink, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, ShieldCheck, ArrowUpRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../../../hooks/useAuth';
+import AuthLayout from './AuthLayout';
+import { Button } from '@/components/ui/button';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -21,7 +20,8 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login,isAuthenticated } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,118 +33,128 @@ const LoginPage = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  if(isAuthenticated){
-    console.log('User is already authenticated, redirecting to dashboard...');
-    redirect('/dashboard');
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
   }
-const onSubmit = async (data: LoginFormData) => {
-  try {
-    setError(null);
 
-    const loginResponse = await login(data);
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      setError(null);
+      const response = await login(data);
 
-    console.log('Login response:', loginResponse);
+      if (response.first_login) {
+        navigate('/auth/change-password', { replace: true });
+        return;
+      }
 
-    if (loginResponse.first_login) {
-      navigate('/auth/change-password', { replace: true });
-      return;
+      navigate('/dashboard', { replace: true });
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Invalid username or password');
     }
+  };
 
-    navigate('/dashboard', { replace: true });
-
-  } catch (err) {
-    console.error('Login error:', err);
-    setError('Invalid username or password');
-  }
-};
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <AuthLayout>
+      <div className="mb-9">
+        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm">
+          <ShieldCheck className="h-6 w-6 text-slate-800" />
+        </div>
 
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl font-bold text-primary">
-            IoT Platform
-          </CardTitle>
-          <CardDescription className="text-center">
-            Enterprise Embedded Linux Monitoring
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+        <h1 className="text-3xl font-semibold tracking-tight">
+          Welcome back
+        </h1>
+
+        <p className="mt-3 text-sm leading-6 text-slate-500">
+          Sign in to access your EdgePulse organization.
+        </p>
+      </div>
+
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="space-y-2">
+          <Label htmlFor="email">Work email</Label>
+          <Input
+          className='py-5'
+            id="email"
+            type="email"
+            placeholder="name@company.com"
+            autoComplete="username"
+            {...register('email')}
+            aria-invalid={!!errors.email}
+          />
+          {errors.email && (
+            <p className="text-xs text-destructive">
+              {errors.email.message}
+            </p>
           )}
+        </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Username or Email</Label>
-              <Input
-                id="email"
-                placeholder="Enter your email"
-                autoFocus
-                {...register('email')}
-                aria-invalid={!!errors.email}
-              />
-              {errors.email && (
-                <p className="text-xs text-destructive">{errors.email.message}</p>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <Link
+              to="/auth/forgot-password"
+              className="text-sm font-medium text-cyan-700 hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
+
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Enter your password"
+              autoComplete="current-password"
+              className="pr-10 py-5"
+              {...register('password')}
+              aria-invalid={!!errors.password}
+            />
+
+            <button
+              type="button"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+              onClick={() => setShowPassword((previous) => !previous)}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
               )}
-            </div>
+            </button>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
-                  {...register('password')}
-                  aria-invalid={!!errors.password}
-                />
-                <button
-                  type="button"
-                  tabIndex={-1}
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-muted-foreground" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-muted-foreground" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-xs text-destructive">{errors.password.message}</p>
-              )}
-            </div>
+          {errors.password && (
+            <p className="text-xs text-destructive">
+              {errors.password.message}
+            </p>
+          )}
+        </div>
 
-            <div className="flex items-center justify-between">
-              {/* <div className="flex items-center space-x-2">
-                <Checkbox id="remember" />
-                <Label htmlFor="remember" className="text-sm font-normal">
-                  Remember me
-                </Label>
-              </div> */}
-              <Link
-                to="/auth/forgot-password"
-                className="text-sm text-primary hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="h-12 w-full bg-slate-900 hover:bg-slate-800"
+        >
+          {isSubmitting ? 'Signing in...' : (
+            <span className="flex items-center gap-2">
+              Sign in <ArrowUpRight className="h-4 w-4" />
+            </span>
+          )}
+        </Button>
+      </form>
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </form>
-
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            Don't have an account? Contact your administrator.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+      <p className="mt-8 text-center text-sm leading-6 text-slate-500">
+        Don't have an account? Contact your administrator.
+      </p>
+    </AuthLayout>
   );
 };
 
