@@ -405,6 +405,50 @@ export interface Metrics {
   timestamp: string;
   cpu: number;
   ram: number;
+  /** Memory breakdown reported by the device agent (kibibytes) */
+  memory?: MetricsMemory;
+}
+
+/** Memory breakdown reported by the device agent (values in kibibytes) */
+export interface MetricsMemory {
+  total_kb?: number;
+  used_kb?: number;
+  free_kb?: number;
+  available_kb?: number;
+  swap_total_kb?: number;
+  swap_used_kb?: number;
+}
+
+/** Usage of a single disk/partition reported by the device agent (values in bytes) */
+export interface MetricsDisk {
+  name?: string;
+  mount_point?: string;
+  file_system?: string;
+  total_bytes?: number;
+  available_bytes?: number;
+  used_bytes?: number;
+  used_percent?: number;
+  read_bytes?: number;
+  written_bytes?: number;
+}
+
+/** Traffic counters of a single network interface reported by the agent (values in bytes) */
+export interface MetricsNetwork {
+  "interface"?: string;
+  received_bytes?: number;
+  transmitted_bytes?: number;
+}
+
+/** Latest reading of a device: cpu/ram + memory + disks + network interfaces */
+export interface MetricsSnapshot {
+  device_id?: string;
+  tenant_id?: string;
+  timestamp: string;
+  cpu?: number;
+  ram?: number;
+  memory?: MetricsMemory;
+  disks?: MetricsDisk[];
+  network?: MetricsNetwork[];
 }
 
 // Audit types

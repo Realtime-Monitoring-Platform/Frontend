@@ -1,4 +1,4 @@
-import { Pagination, Device, createDeviceDto, DeviceResponse, DeviceCommand } from "@/types";
+import { Pagination, Device, createDeviceDto, DeviceResponse, DeviceCommand, MetricsSnapshot } from "@/types";
 import { api } from "./api";
 
 
@@ -25,9 +25,28 @@ import { api } from "./api";
 export const fetchDeviceMetrics = async (deviceId: string, startTime: string): Promise<any> => {
     try {
         const response = await api.get(`/query/metrics/deviceid/${deviceId}?startTime=${startTime}`);
+        console.log("fetchDeviceMetrics response:", response.data);
         return response.data;
     } catch (error) {
         throw new Error('Failed to fetch device metrics');
+    }
+};
+
+/**
+ * Latest reading of a device: cpu/ram, memory breakdown, disks and network interfaces.
+ * Returns `null` when the device never reported any metric.
+ */
+export const fetchLatestDeviceMetrics = async (
+    deviceId: string,
+    startTime = '-24h'
+): Promise<MetricsSnapshot | null> => {
+    try {
+        const response = await api.get(
+            `/query/metrics/latest/deviceid/${deviceId}?startTime=${startTime}`
+        );
+        return response.data && typeof response.data === 'object' ? response.data : null;
+    } catch (error) {
+        throw new Error('Failed to fetch latest device metrics');
     }
 };
 

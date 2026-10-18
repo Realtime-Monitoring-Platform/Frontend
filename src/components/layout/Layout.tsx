@@ -25,7 +25,7 @@ export const Layout = () => {
         style={{ width: 'calc(100% - 260px)' }}
       >
          <Header onMenuClick={handleMenuClick} /> 
-        <div className="h-14" /> {/* Spacer for fixed header */}
+        {/* Spacer for fixed header */}
         <div className="p-3">
           <Outlet />
         </div>
