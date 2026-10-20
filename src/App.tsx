@@ -141,6 +141,10 @@ const SettingsPage = lazy(
   () => import('./features/settings/pages/SettingsPage')
 );
 
+const DocumentationPage = lazy(
+  () => import('./features/documentation/pages/DocumentationPage')
+);
+
 
 const AIDashboardPage = lazy(
   () => import('./features/ai/pages/AIDashboardPage')
@@ -458,6 +462,11 @@ const AppRoutes = () => {
           <Route
             path="notifications"
             element={<NotificationsPage />}
+          />
+
+          <Route
+            path="documentation"
+            element={<DocumentationPage />}
           />
 
           <Route

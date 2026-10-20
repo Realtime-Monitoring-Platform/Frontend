@@ -82,7 +82,7 @@ const DeviceListPage = () => {
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
   });
-
+  console.log(devices);
   const allDevices: Device[] = devices?.content ?? [];
 
   // The extra fields are optional because their availability depends
@@ -181,27 +181,9 @@ const DeviceListPage = () => {
     return 'border-border bg-muted text-muted-foreground';
   };
 
-  const getUsage = (device: Device, kind: 'cpu' | 'memory') => {
-    const d = device as any;
-    const value =
-      kind === 'cpu'
-        ? d.cpuUsage ?? d.cpuPercent ?? d.cpu
-        : d.memoryUsage ?? d.memoryPercent ?? d.ramUsage ?? d.memory;
+ 
 
-    if (value === undefined || value === null || value === '') return null;
-
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? Math.max(0, Math.min(100, parsed)) : null;
-  };
-
-  const formatLastSeen = (value: unknown) => {
-    if (!value) return 'Never';
-
-    const date = new Date(String(value));
-    if (Number.isNaN(date.getTime())) return String(value);
-
-    return date.toLocaleString();
-  };
+  
 
   const totalElements = Number(devices?.totalElements ?? allDevices.length);
   const totalPages = Number(devices?.totalPages ?? 1);
@@ -406,9 +388,9 @@ const DeviceListPage = () => {
                 <th className="px-4 py-3.5 font-medium">Status</th>
                 <th className="px-4 py-3.5 font-medium">Model</th>
                 <th className="px-4 py-3.5 font-medium">Team</th>
-                <th className="px-4 py-3.5 font-medium">CPU</th>
+                <th className="px-4 py-3.5 font-medium">CPU Count</th>
                 <th className="px-4 py-3.5 font-medium">Memory</th>
-                <th className="px-4 py-3.5 font-medium">Last seen</th>
+                <th className="px-4 py-3.5 font-medium">IP Address</th>
                 <th className="px-4 py-3.5 text-right font-medium">Actions</th>
               </tr>
             </thead>
@@ -417,8 +399,7 @@ const DeviceListPage = () => {
               {filteredDevices.map((device) => {
                 const d = device as any;
                 const status = getStatus(device);
-                const cpu = getUsage(device, 'cpu');
-                const memory = getUsage(device, 'memory');
+               
 
                 return (
                   <tr
@@ -465,15 +446,19 @@ const DeviceListPage = () => {
                     </td>
 
                     <td className="px-4 py-4">
-                      <UsageBar value={cpu} icon={<Cpu className="h-3.5 w-3.5" />} />
+                      {device.cpuCount} 
+                      {/* <UsageBar value={cpu} icon={<Cpu className="h-3.5 w-3.5" />} /> */}
                     </td>
 
                     <td className="px-4 py-4">
-                      <UsageBar value={memory} icon={<MemoryStick className="h-3.5 w-3.5" />} />
+                      {device?.totalMemoryKb
+                        ? (device.totalMemoryKb / 1024 / 1024 / 1024).toFixed(2)
+                        : '0.00'} GB                    {/* <UsageBar value={(device?.totalMemoryKb ? device.totalMemoryKb / 1024 / 1024 : 0)} icon={<MemoryStick className="h-3.5 w-3.5" />} /> */}
                     </td>
 
                     <td className="whitespace-nowrap px-4 py-4 text-xs text-muted-foreground">
-                      {formatLastSeen(d.lastSeen)}
+
+                      {device.ipAddress || "No IP address"}
                     </td>
 
                     <td className="px-4 py-4">

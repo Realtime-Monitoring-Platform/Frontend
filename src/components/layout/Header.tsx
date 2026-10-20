@@ -153,7 +153,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
       {/* Right: search and actions */}
       <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
         {/* Global search */}
-        <div className="relative hidden w-52 lg:block xl:w-72">
+        {/* <div className="relative hidden w-52 lg:block xl:w-72">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 
           <Input
@@ -177,7 +177,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
             <Command className="h-2.5 w-2.5" />
             K
           </kbd>
-        </div>
+        </div> */}
 
         {/* Theme toggle */}
         <Button

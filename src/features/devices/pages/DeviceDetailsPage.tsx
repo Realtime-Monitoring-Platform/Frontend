@@ -3,6 +3,8 @@ import {
   getAnalyzeBYdEVICEiD,
   updateAiRecommendationStatus,
 } from "@/services/AiAnalyze";
+import ReactECharts from "echarts-for-react";
+
 import { Link, useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,9 +26,9 @@ import DeviceTerminal from "@/components/Deviceterminal";
 import DeviceLogs from "./DeviceLogs";
 import DeviceMetrics from "./DeviceMetrics";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getDeviceById, getDeviceCommandHistory } from "@/services/deviceAction";
-import { AiIncident, DeviceCommand, Pagination as PaginationType } from "@/types";
-import { useState } from "react";
+import { getDeviceById, getDeviceCommandHistory, fetchLatestDeviceMetrics, fetchDeviceMetrics } from "@/services/deviceAction";
+import { AiIncident, DeviceCommand, MetricsSnapshot, Pagination as PaginationType } from "@/types";
+import { useMemo, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-hot-toast";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -46,6 +48,7 @@ import { AlertRow, Analysis, Badge, Button, Commands, Logs, PageHeading, StatCar
 import { Icon } from "@/Utils/Icon";
 import { MiniChart } from "@/Utils/Minichart";
 import { Button as ShadecnButton } from "@/components/ui/button";
+import { buildTrendOption } from "@/Utils";
 const DeviceDetailsPage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -93,6 +96,26 @@ const DeviceDetailsPage = () => {
     )
     : [];
   const latestIncident = currentPage === 0 ? incidents[0] : undefined;
+
+  const { data: latestMetrics } = useQuery<MetricsSnapshot | null>({
+    queryKey: ["deviceLatestMetrics", id],
+    queryFn: () => fetchLatestDeviceMetrics(id || ""),
+    enabled: Boolean(id),
+    staleTime: 30 * 1000,
+    refetchInterval: 30 * 1000,
+  });
+
+  const latestMetricPoint = latestMetrics;
+  const cpuValue = latestMetricPoint?.cpu ?? 0;
+  const ramValue = latestMetricPoint?.ram ?? 0;
+  const memory = latestMetricPoint?.memory;
+  const memoryUsedGb = memory?.used_kb !== undefined ? (memory.used_kb / 1024 / 1024).toFixed(1) : "—";
+  const memoryTotalGb = memory?.total_kb !== undefined ? (memory.total_kb / 1024 / 1024).toFixed(1) : "—";
+  const disk = latestMetricPoint?.disks?.[0];
+  const diskPercent = disk?.used_percent ?? 0;
+  const diskUsedGb = disk?.used_bytes !== undefined ? (disk.used_bytes / 1024 / 1024 / 1024).toFixed(1) : "—";
+  const diskTotalGb = disk?.total_bytes !== undefined ? (disk.total_bytes / 1024 / 1024 / 1024).toFixed(1) : "—";
+  const diskTone = diskPercent >= 90 ? "red" : diskPercent >= 75 ? "orange" : "blue";
   const historyIncidents = currentPage === 0 ? incidents.slice(1) : incidents;
 
   const approveCommand = async (
@@ -139,13 +162,124 @@ const DeviceDetailsPage = () => {
       setApprovingPriority(null);
     }
   };
+  const { id: deviceId } = useParams()
+  const timeRange = "-7d";
+  const {
+    data: metrics = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["deviceMetrics", deviceId, timeRange],
+    queryFn: () => fetchDeviceMetrics(deviceId || "", timeRange),
+    enabled: Boolean(deviceId),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+  if (metrics) {
+    console.log(metrics)
+  }
+
+
+
+  const latest = metrics.at(-1);
+  const trendOption = useMemo(
+    () => buildTrendOption(metrics),
+    [metrics]
+  );
 
   const isOnline =
     status.label.toLowerCase() === "active" ||
     status.label.toLowerCase() === "online";
+
+  // Delta between the two most recent samples of the metrics history.
+  const previousMetric = metrics.length > 1 ? metrics[metrics.length - 2] : undefined;
+  const formatDelta = (current?: number, previous?: number, unit = "%") => {
+    if (typeof current !== "number" || typeof previous !== "number") return "—";
+    const delta = current - previous;
+    return `${delta > 0 ? "+" : ""}${delta.toFixed(1)}${unit}`;
+  };
+  console.log(deviceId)
+  const { data: snapshot } = useQuery<MetricsSnapshot | null>({
+    queryKey: ["deviceMetricsSnapshot", deviceId, timeRange],
+    queryFn: () => fetchLatestDeviceMetrics(deviceId || "", timeRange),
+    enabled: Boolean(deviceId),
+    staleTime: 30 * 1000,
+    refetchInterval: 30 * 1000,
+  });
+  const formatGB = (bytes?: number | null): string => {
+    if (bytes == null || !Number.isFinite(bytes)) return "—";
+    return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
+  };
+
+  const getPercentage = (
+    used?: number | null,
+    total?: number | null
+  ): number => {
+    if (
+      used == null ||
+      total == null ||
+      !Number.isFinite(used) ||
+      !Number.isFinite(total) ||
+      total <= 0
+    ) {
+      return 0;
+    }
+
+    return Math.min(100, Math.max(0, (used / total) * 100));
+  };
+  console.log("snapshot", snapshot)
+  const hasMetrics = Boolean(latestMetricPoint);
+  console.log(metrics)
+  const detailStats = (
+    <div className="detail-stats">
+      <StatCard
+        label="CPU utilization"
+        value={`${getPercentage(
+          snapshot?.memory?.used_kb,
+          snapshot?.memory?.total_kb
+        ).toFixed(1)} %`}
+      change={formatDelta(latest?.cpu, previousMetric?.cpu)}
+      icon="cpu"
+      tone={cpuValue >= 90 ? "red" : cpuValue >= 70 ? "orange" : "blue"}
+      data="live from device"
+      />
+      <StatCard
+        label="Memory usage"
+        value={`${getPercentage(
+          snapshot?.memory?.used_kb,
+          snapshot?.memory?.total_kb
+        ).toFixed(1)} %`}
+      change={formatDelta(latest?.ram, previousMetric?.ram)}
+      icon="activity"
+      tone={ramValue >= 90 ? "red" : ramValue >= 70 ? "orange" : "green"}
+      data={snapshot?.memory?.total_kb !== undefined ? `${formatGB(snapshot?.memory?.used_kb)} of ${formatGB(snapshot?.memory?.total_kb)}` : "live from device"}
+      />
+      <StatCard
+        label="Temperature"
+        value="N/A"
+        change="—"
+        icon="alert"
+        tone="neutral"
+        data="not reported by agent"
+      />
+      <StatCard
+        label="Disk usage"
+        value={`${getPercentage(
+          snapshot?.disks?.[0]?.used_bytes,
+          snapshot?.disks?.[0]?.total_bytes
+        ).toFixed(1)} %`}
+        change="—"
+        icon="device"
+        tone={diskTone}
+        data={snapshot?.disks?.[0]?.used_bytes !== undefined ? `${formatGB(snapshot?.disks?.[0]?.used_bytes)} of ${formatGB(snapshot?.disks?.[0]?.total_bytes)}` : "no disk reported" }
+      />
+    </div>
+  );
+
   const [tab, setTab] = useState("Overview");
   const tabs = ["Overview", "Metrics", "Logs", "AI Analysis", "Commands", "Command History"];
-
+  console.log(metrics)
   return (
 
 
@@ -213,7 +347,9 @@ const DeviceDetailsPage = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <Button variant="secondary" icon="settings">Edit device</Button><Button icon="command" onClick={() => { }}>Run command</Button>
+              <Button variant="secondary" icon="settings">Edit device</Button><Button icon="command" onClick={() => {
+                setTab("Commands");
+              }}>Run command</Button>
             </div>
 
           </div>
@@ -223,64 +359,38 @@ const DeviceDetailsPage = () => {
 
       </div>
 
-      {/* <div className="device-detail-head">
-      <button className="back-link" onClick={() => {}}>‹ Back to devices</button>
-      <div className="device-title-row"><div className="device-hero-icon"><Icon name="device" size={22} /></div><div><div className="title-with-status"><h1>Assembly Controller 12</h1><Badge tone="warning" dot>Warning</Badge><Badge tone="neutral">Demo data</Badge></div><p><code>dev_ac_12f9</code> · NXP i.MX 8M Plus · Factory West</p></div><div className="device-actions"><Button variant="secondary" icon="settings">Edit device</Button><Button icon="command" onClick={() => Navigate("Commands")}>Run command</Button></div></div>
-      <div className="detail-tabs">{tabs.map((item) => <button className={tab === item ? "active" : ""} onClick={() => setTab(item)} key={item}>{item}</button>)}</div>
-    </div> */}
-      {/* {tab === "Overview" || tab === "Metrics" ? <div className="detail-content">
-        <div className="detail-stats"><StatCard label="CPU utilization" value="87%" change="+18.2%" icon="cpu" tone="red" data="5 min average" /><StatCard label="Memory usage" value="74%" change="+3.4%" icon="activity" tone="orange" data="2.9 of 4 GB" /><StatCard label="Temperature" value="89.4°C" change="+8.1°C" icon="alert" tone="red" data="critical threshold" /><StatCard label="Disk usage" value="52%" change="+1.2%" icon="device" tone="blue" data="31.2 of 60 GB" /></div>
-        <div className="device-overview-grid">
-          <section className="card detail-chart"><div className="card-header"><div><h2>System utilization</h2><p>Historical telemetry · last 6 hours</p></div><select><option>Last 6 hours</option><option>Last 24 hours</option></select></div><div className="chart-legend"><span><i className="blue-dot" />CPU</span><span><i className="green-dot" />Memory</span></div><div className="detail-chart-canvas"><MiniChart /><MiniChart color="green" fill={false} /></div></section>
-          <section className="card system-info"><div className="card-header"><div><h2>System information</h2><p>Last synchronized just now</p></div></div>{[["Operating system", "Yocto Linux 4.0"], ["Kernel", "6.1.55-rt16"], ["Architecture", "aarch64"], ["Agent version", "v1.8.2"], ["IP address", "10.24.8.112"], ["MQTT session", "TLS 1.3"]].map(([k, v]) => <div key={k}><span>{k}</span><code>{v}</code></div>)}</section>
-          <section className="card recent-events"><div className="card-header"><div><h2>Recent device events</h2><p>Telemetry, alerts, and agent activity</p></div><button className="text-btn" onClick={() => setTab("Logs")}>View logs <Icon name="chevron" size={13} /></button></div><AlertRow severity="Critical" title="CPU temperature threshold exceeded" device="89.4°C observed for 4 minutes" time="2 min ago" /><AlertRow severity="Warning" title="CPU frequency throttled" device="Clock reduced to 1.2 GHz" time="4 min ago" /><AlertRow severity="Info" title="Configuration synchronized" device="Agent revision 1842 applied" time="28 min ago" /></section>
-        </div>
-      </div> : tab === "Logs" ? <Logs embedded /> : tab === "AI Analysis" ? <Analysis /> : tab === "Commands" ? <Commands /> : <section className="card tab-state"><span><Icon name={tab === "Configuration" ? "settings" : "alert"} size={24} /></span><h2>{tab}</h2><p>Device-specific {tab.toLowerCase()} for <code>dev_ac_12f9</code>.</p><Button variant="secondary">Configure view</Button></section>} */}
       <div className="detail-content">
         <Tabs defaultValue="Overview" value={tab} onValueChange={setTab} className="w-full flex flex-col space-y-4">
-          {/* <TabsList className="h-auto w-full justify-start gap-6 overflow-x-auto rounded-none border-b border-border bg-transparent p-0">
-            {tabs.map((item) => (
-              <TabsTrigger
-                key={item}
-                value={item}
-                className="rounded-none border-b-2 border-transparent bg-transparent px-1 pb-3 text-sm text-muted-foreground shadow-none data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
-              >
-                {item}
-              </TabsTrigger>
-            ))}
-          </TabsList> */}
 
           <TabsContent value="Overview" className="mt-4">
             <div className="detail-content">
-              <div className="detail-stats">
-                <StatCard label="CPU utilization" value="87%" change="+18.2%" icon="cpu" tone="red" data="5 min average" />
-                <StatCard label="Memory usage" value="74%" change="+3.4%" icon="activity" tone="orange" data="2.9 of 4 GB" />
-                <StatCard label="Temperature" value="89.4°C" change="+8.1°C" icon="alert" tone="red" data="critical threshold" />
-                <StatCard label="Disk usage" value="52%" change="+1.2%" icon="device" tone="blue" data="31.2 of 60 GB" />
-              </div>
+              {detailStats}
 
-              <div className="device-overview-grid">
-                <section className="card detail-chart">
-                  <div className="card-header">
-                    <div>
-                      <h2>System utilization</h2>
-                      <p>Historical telemetry · last 6 hours</p>
+              <div className="device-overview-grid w-full">
+                <section className="card w-full ">
+
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                    <CardTitle>
+                      Real-time Metrics{" "}
+                      <span className="text-muted-foreground">
+                        (Last {timeRange.replace("-", "")})
+                      </span>
+                    </CardTitle>
+
+                    <div className="flex gap-1">
+
                     </div>
-                    <select>
-                      <option>Last 6 hours</option>
-                      <option>Last 24 hours</option>
-                    </select>
-                  </div>
+                  </CardHeader>
 
-                  <div className="chart-legend">
-                    <span><i className="blue-dot" />CPU</span>
-                    <span><i className="green-dot" />Memory</span>
-                  </div>
+                  <CardContent>
+                    <ReactECharts
+                      option={trendOption}
+                      className="h-[320px] w-full"
+                      notMerge
+                      lazyUpdate
+                    />
+                  </CardContent>
 
-                  <div className="detail-chart-canvas">
-                    <MiniChart />
-                    <MiniChart color="green" fill={false} />
-                  </div>
                 </section>
 
                 <section className=" card system-info divide-y divide-border px-2">
@@ -291,23 +401,7 @@ const DeviceDetailsPage = () => {
                     </div>
                   </div>
 
-                  {/* {[
-                    ["Operating system", "Yocto Linux 4.0"],
-                    ["Kernel", "6.1.55-rt16"],
-                    ["Architecture", "aarch64"],
-                    ["Agent version", "v1.8.2"],
-                    ["IP address", "10.24.8.112"],
-                    ["MQTT session", "TLS 1.3"],
-                  ].map(([k, v]) => ( */}
-                  {/* <div className="flex items-center px-5 py-4 sm:px-4">
-              <Spec label="Hostname" value={deviceDetails?.hostname} />
-            </div>
-            <div className="flex items-center px-5 py-4 sm:px-4">
-              <Spec label="IP address" value={deviceDetails?.ipAddress} />
-            </div>
-            <div className="flex items-center px-5 py-4 sm:px-4">
-              <Spec label="MAC address" value={deviceDetails?.macAddress} />
-            </div> */}
+
                   <div>
                     <h2 className="text-sm">Hostname</h2>
                     <h2 className="text-sm">{deviceDetails?.hostname}</h2>
@@ -395,14 +489,7 @@ const DeviceDetailsPage = () => {
 
           <TabsContent value="Metrics" className="mt-4">
             <div className="detail-content">
-              <div className="detail-stats">
-                <StatCard label="CPU utilization" value="87%" change="+18.2%" icon="cpu" tone="red" data="5 min average" />
-                <StatCard label="Memory usage" value="74%" change="+3.4%" icon="activity" tone="orange" data="2.9 of 4 GB" />
-                <StatCard label="Temperature" value="89.4°C" change="+8.1°C" icon="alert" tone="red" data="critical threshold" />
-                <StatCard label="Disk usage" value="52%" change="+1.2%" icon="device" tone="blue" data="31.2 of 60 GB" />
-              </div>
-
-
+              {detailStats}
             </div>
           </TabsContent>
           <TabsContent value="Logs" className="">
@@ -421,22 +508,7 @@ const DeviceDetailsPage = () => {
               </CardContent>
             </Card>
           </TabsContent>
-          {/* <TabsContent value="Logs" className="mt-4">
-            <Logs embedded />
-          </TabsContent> */}
 
-          {/* <TabsContent value="Alerts" className="mt-4">
-            <section className="card tab-state">
-              <span><Icon name="alert" size={24} /></span>
-              <h2>Alerts</h2>
-              <p>Device-specific alerts for <code>dev_ac_12f9</code>.</p>
-              <Button variant="secondary">Configure view</Button>
-            </section>
-          </TabsContent> */}
-
-          {/* <TabsContent value="AI Analysis" className="mt-4">
-            <Analysis />
-          </TabsContent> */}
 
           <TabsContent value="Commands" className="mt-4">
             {/* <Commands /> */}
@@ -453,361 +525,18 @@ const DeviceDetailsPage = () => {
         </Tabs>
       </div>
 
-      {/* ── Spec strip ──────────────────────────────────────────────── */}
-      {/* <Card className="overflow-hidden">
-          <CardContent className="p-0">
-            <div className="grid grid-cols-2 divide-y divide-border sm:grid-cols-4 sm:divide-x sm:divide-y-0">
-              <div className="flex items-center gap-2.5 px-5 py-4">
-                <span className="relative flex h-2.5 w-2.5 shrink-0">
-                  {isOnline && (
-                    <span
-                      className={`absolute inline-flex h-full w-full animate-ping rounded-full ${status.dot} opacity-60`}
-                    />
-                  )}
-                  <span
-                    className={`relative inline-flex h-2.5 w-2.5 rounded-full ${status.dot}`}
-                  />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[11px] font-medium text-muted-foreground">
-                    Status
-                  </p>
-                  <p className={`mt-0.5 truncate text-sm font-semibold ${status.text}`}>
-                    {status.label}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center px-5 py-4 sm:px-4">
-                <Spec label="Hostname" value={deviceDetails?.hostname} />
-              </div>
-              <div className="flex items-center px-5 py-4 sm:px-4">
-                <Spec label="IP address" value={deviceDetails?.ipAddress} />
-              </div>
-              <div className="flex items-center px-5 py-4 sm:px-4">
-                <Spec label="MAC address" value={deviceDetails?.macAddress} />
-              </div>
-            </div>
-          </CardContent>
-        </Card> */}
 
       {/* ── Tabs ────────────────────────────────────────────────────── */}
       <Tabs defaultValue="overview" value={tab} onValueChange={setTab} className="flex flex-col space-y-4">
-        {/* <div className="w-full border-b border-border">
-          <TabsList className="h-auto w-full justify-start gap-6 overflow-x-auto rounded-none bg-transparent p-0">
-            {tabs.map((item) => {
-              const value = item.toLowerCase().replace(/\s+/g, "-");
 
-              return (
-                <TabsTrigger
-                  key={value}
-                  value={value}
-                  className="rounded-none border-b-2 border-transparent bg-transparent px-0.5 pb-3 text-sm text-muted-foreground shadow-none data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
-                >
-                  {item}
-                </TabsTrigger>
-              );
-            })}
-          </TabsList> 
-        </div>*/}
 
-        {/* Overview */}
-        {/* <TabsContent value="Overview" className="mt-0 space-y-4">
-          <Card>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-base">Device information</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                System details synchronized from the device agent
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2">
-                <div className="space-y-6">
-                  <div>
-                    <SectionLabel>General</SectionLabel>
-                    <div className="divide-y divide-border">
-                      <InfoRowMono label="Device ID" value={deviceDetails?.id} />
-                      <InfoRow label="Device name" value={deviceDetails?.deviceName} />
-                      <InfoRow
-                        label="Description"
-                        value={deviceDetails?.description || "No description"}
-                      />
-                      <InfoRowMono
-                        label="Device identifier"
-                        value={deviceDetails?.deviceIdentifier}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <SectionLabel>Hardware</SectionLabel>
-                    <div className="divide-y divide-border">
-                      <InfoRow
-                        label="CPU count"
-                        value={deviceDetails?.cpuCount ?? undefined}
-                      />
-                      <InfoRow
-                        label="Total memory"
-                        value={
-                          deviceDetails?.totalMemoryKb
-                            ? `${(deviceDetails.totalMemoryKb / 1024 / 1024).toFixed(2)} GB`
-                            : undefined
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <SectionLabel>Network</SectionLabel>
-                    <div className="divide-y divide-border">
-                      <InfoRowMono label="Hostname" value={deviceDetails?.hostname} />
-                      <InfoRowMono label="IP address" value={deviceDetails?.ipAddress} />
-                      <InfoRowMono label="MAC address" value={deviceDetails?.macAddress} />
-                    </div>
-                  </div>
-                  <div>
-                    <SectionLabel>Operating system</SectionLabel>
-                    <div className="divide-y divide-border">
-                      <InfoRow label="OS name" value={deviceDetails?.osName} />
-                      <InfoRow label="OS version" value={deviceDetails?.osVersion} />
-                      <InfoRowMono
-                        label="Kernel version"
-                        value={deviceDetails?.kernelVersion}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <SectionLabel>Assignment</SectionLabel>
-                    <div className="divide-y divide-border">
-                      <InfoRow label="Team" value={deviceDetails?.teamName} />
-                      <InfoRow label="Tenant" value={deviceDetails?.tenantName} />
-                      <InfoRow
-                        label="Assigned user"
-                        value={deviceDetails?.assignedUserName || "Unassigned"}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <SectionLabel>Timestamps</SectionLabel>
-                    <div className="divide-y divide-border">
-                      <InfoRow
-                        label="Created"
-                        value={
-                          deviceDetails?.createdAt
-                            ? new Date(deviceDetails.createdAt).toLocaleString()
-                            : undefined
-                        }
-                      />
-                      <InfoRow
-                        label="Updated"
-                        value={
-                          deviceDetails?.updatedAt
-                            ? new Date(deviceDetails.updatedAt).toLocaleString()
-                            : undefined
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent> */}
-
-        {/* <TabsContent value="Overview" className="mt-0 space-y-4">
-         
-          <section className="card detail-chart">
-            <div className="card-header">
-              <div>
-                <h2>System utilization</h2>
-                <p>Historical telemetry · last 6 hours</p>
-              </div>
-
-              <select
-                className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-                defaultValue="6h"
-              >
-                <option value="6h">Last 6 hours</option>
-                <option value="24h">Last 24 hours</option>
-                <option value="7d">Last 7 days</option>
-              </select>
-            </div>
-
-            <div className="chart-legend">
-              <span>
-                <i className="blue-dot" />
-                CPU
-              </span>
-              <span>
-                <i className="green-dot" />
-                Memory
-              </span>
-            </div>
-
-            <div className="detail-chart-canvas">
-              <div className="min-w-0">
-                <p className="mb-2 text-xs text-muted-foreground">CPU usage (%)</p>
-                <MiniChart />
-              </div>
-
-              <div className="min-w-0">
-                <p className="mb-2 text-xs text-muted-foreground">Memory usage (%)</p>
-                <MiniChart color="green" fill={false} />
-              </div>
-            </div>
-          </section>
-
-          
-          <Card>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-base">Device information</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                System details synchronized from the device agent
-              </p>
-            </CardHeader>
-
-            <CardContent>
-              <div className="grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2">
-                <div className="space-y-6">
-                  <div>
-                    <SectionLabel>General</SectionLabel>
-                    <div className="divide-y divide-border">
-                      <InfoRowMono label="Device ID" value={deviceDetails?.id} />
-                      <InfoRow
-                        label="Device name"
-                        value={deviceDetails?.deviceName}
-                      />
-                      <InfoRow
-                        label="Description"
-                        value={deviceDetails?.description || "No description"}
-                      />
-                      <InfoRowMono
-                        label="Device identifier"
-                        value={deviceDetails?.deviceIdentifier}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <SectionLabel>Hardware</SectionLabel>
-                    <div className="divide-y divide-border">
-                      <InfoRow
-                        label="CPU count"
-                        value={deviceDetails?.cpuCount ?? undefined}
-                      />
-                      <InfoRow
-                        label="Total memory"
-                        value={
-                          deviceDetails?.totalMemoryKb
-                            ? `${(
-                              deviceDetails.totalMemoryKb /
-                              1024 /
-                              1024
-                            ).toFixed(2)} GB`
-                            : undefined
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <SectionLabel>Network</SectionLabel>
-                    <div className="divide-y divide-border">
-                      <InfoRowMono
-                        label="Hostname"
-                        value={deviceDetails?.hostname}
-                      />
-                      <InfoRowMono
-                        label="IP address"
-                        value={deviceDetails?.ipAddress}
-                      />
-                      <InfoRowMono
-                        label="MAC address"
-                        value={deviceDetails?.macAddress}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <SectionLabel>Operating system</SectionLabel>
-                    <div className="divide-y divide-border">
-                      <InfoRow label="OS name" value={deviceDetails?.osName} />
-                      <InfoRow
-                        label="OS version"
-                        value={deviceDetails?.osVersion}
-                      />
-                      <InfoRowMono
-                        label="Kernel version"
-                        value={deviceDetails?.kernelVersion}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <SectionLabel>Assignment</SectionLabel>
-                    <div className="divide-y divide-border">
-                      <InfoRow label="Team" value={deviceDetails?.teamName} />
-                      <InfoRow label="Tenant" value={deviceDetails?.tenantName} />
-                      <InfoRow
-                        label="Assigned user"
-                        value={
-                          deviceDetails?.assignedUserName || "Unassigned"
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <SectionLabel>Timestamps</SectionLabel>
-                    <div className="divide-y divide-border">
-                      <InfoRow
-                        label="Created"
-                        value={
-                          deviceDetails?.createdAt
-                            ? new Date(deviceDetails.createdAt).toLocaleString()
-                            : undefined
-                        }
-                      />
-                      <InfoRow
-                        label="Updated"
-                        value={
-                          deviceDetails?.updatedAt
-                            ? new Date(deviceDetails.updatedAt).toLocaleString()
-                            : undefined
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent> */}
 
         {/* Metrics */}
         <TabsContent value="Metrics" className="mt-0">
           {id && <DeviceMetrics id={id} />}
         </TabsContent>
 
-        {/* Logs */}
-        {/* <TabsContent value="Logs" className="mt-0">
-          <Card className="overflow-hidden border-border/80">
-            <CardHeader className="border-b border-border/70 pb-4">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Activity className="h-4 w-4 text-primary" />
-                Live device logs
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Streaming structured logs from the connected agent
-              </p>
-            </CardHeader>
-            <CardContent className="p-0">
-              {id && <DeviceLogs deviceId={id} />}
-            </CardContent>
-          </Card>
-        </TabsContent> */}
+
 
         {/* Commands */}
         <TabsContent value="Commands" className="mt-0" id="commands">
@@ -921,23 +650,23 @@ const DeviceDetailsPage = () => {
                             </td>
                             <td className="px-4 py-3.5">
                               <Badge
-                              tone={isSuccess ? "success" : isFailed ? "danger" : "neutral"}
-                                // className={
-                                //   isSuccess
-                                //     ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400"
-                                //     : isFailed
-                                //       ? "border-red-500/30 bg-red-500/5 text-red-700 dark:text-red-400"
-                                //       : "text-muted-foreground"
-                                // }
+                                tone={isSuccess ? "success" : isFailed ? "danger" : "neutral"}
+                              // className={
+                              //   isSuccess
+                              //     ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400"
+                              //     : isFailed
+                              //       ? "border-red-500/30 bg-red-500/5 text-red-700 dark:text-red-400"
+                              //       : "text-muted-foreground"
+                              // }
                               >
                                 {command.status}
                               </Badge>
                             </td>
                             <td className="px-3 py-3.5">
                               <Button
-                                
+
                                 variant="ghost"
-                               
+
                                 className="h-8 w-8 opacity-0 group-hover:opacity-100"
                               >
                                 <span className="text-muted-foreground">⋯</span>
@@ -950,10 +679,6 @@ const DeviceDetailsPage = () => {
                   </table>
                 </div>
               )}
-
-              {/* Optional: expand stdout under the table or in a detail drawer.
-          If you still want stdout visible, keep a collapsible row or
-          move it to a side panel on the ⋯ action. */}
 
               {commandHistory && commandHistory.totalPages > 1 && (
                 <div className="flex items-center justify-between border-t border-border px-5 py-3">
@@ -985,127 +710,7 @@ const DeviceDetailsPage = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        {/* Command history */}
-        {/* <TabsContent value="Command History" className="mt-0">
-          <Card>
-            <CardHeader className="border-b border-border/70">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Clock3 className="h-4 w-4 text-primary" />
-                Command history
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Chronological record of commands sent to this device
-              </p>
-            </CardHeader>
-            <CardContent className="pt-5">
-              <section className="card full-command-history"><div className="card-header"><div><h2>Command history</h2><p>Auditable execution history across authorized devices</p></div><div className="heading-actions"><select><option>All statuses</option><option>Completed</option><option>Failed</option></select><Button variant="secondary" icon="external">Export audit log</Button></div></div>
-                <table className="data-table">
-                  <thead><tr><th>Command</th>
-                    <th>Target device</th><th>Requested by</th>
-                    <th>Started</th><th>Duration</th><th>Status</th><th />
-                  </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      ["Collect system diagnostics", "Assembly Controller 12", "Alex Kim", "Just now", "3.1s", "Completed"], ["Refresh agent configuration", "Edge Gateway 07", "Maya Chen", "18 min ago", "1.8s", "Completed"], ["Restart monitoring agent", "Cold Storage Sensor 03", "Alex Kim", "1 hr ago", "8.4s", "Completed"], ["Rotate device certificate", "Vision Node 04", "Noah Wilson", "3 hrs ago", "12.0s", "Failed"], ["Collect system diagnostics", "Quality Station 02", "Priya Shah", "Yesterday", "2.7s", "Completed"]
-                    ].map(row =>
-                      <tr key={row[0] + row[1]}>
-                        {row.slice(0, 5).map((cell, i) =>
-                          <td key={cell}>{i === 0 ? <b className="primary-cell">{cell}</b>
-                            : cell}</td>)}
-                        <td><Badge tone={row[5] === "Failed" ? "danger" : "success"}>{row[5]}
-                        </Badge>
-                        </td>
-                        <td><button className="icon-btn">⋯</button>
-                        </td>
-                      </tr>)}
-                  </tbody>
-                </table>
-              </section>
 
-              <div className="space-y-2.5">
-                {commandHistory?.content?.length === 0 ? (
-                  <p className="py-8 text-center text-sm text-muted-foreground">
-                    No commands have been recorded for this device.
-                  </p>
-                ) : (
-                  commandHistory?.content?.map((command) => (
-                    <div
-                      key={command.id}
-                      className="rounded-lg border border-border bg-muted/20 p-3.5 text-sm transition-colors hover:bg-muted/35"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <code className="font-mono text-[13px]">
-                          {command.command}
-                        </code>
-                        <Badge
-                          variant="outline"
-                          className={
-                            command.status === "COMPLETED" ||
-                              command.status === "SUCCESS"
-                              ? "border-emerald-500/30 text-emerald-600"
-                              : command.status === "FAILED"
-                                ? "border-red-500/30 text-red-600"
-                                : ""
-                          }
-                        >
-                          {command.status}
-                        </Badge>
-                      </div>
-                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                        <span>
-                          {command.userId ||
-                            (command.aiGenerated ? "AI generated" : "Unknown")}
-                        </span>
-                        <span>
-                          {command.aiGenerated ? "AI approved" : "User command"}
-                        </span>
-                        <span>
-                          {new Date(command.createdAt).toLocaleString()}
-                        </span>
-                        {command.exitCode !== null && (
-                          <span>exit {command.exitCode}</span>
-                        )}
-                      </div>
-                      {command.stdout && (
-                        <pre className="mt-2.5 overflow-x-auto whitespace-pre-wrap rounded-md border border-border/60 bg-background p-2.5 font-mono text-xs leading-relaxed">
-                          {command.stdout}
-                        </pre>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {commandHistory && commandHistory.totalPages > 1 && (
-                <div className="mt-5 flex items-center justify-center gap-2 border-t border-border pt-4">
-                  <Button
-                    type="button"
-                    //  variant="outline"
-                    size="sm"
-                    disabled={commandHistory.first}
-                    onClick={() => setCommandHistoryPage((p) => p - 1)}
-                  >
-                    Previous
-                  </Button>
-                  <span className="text-sm text-muted-foreground">
-                    Page {commandHistory.number + 1} of{" "}
-                    {commandHistory.totalPages}
-                  </span>
-                  <Button
-                    type="button"
-                    // variant="outline"
-                    size="sm"
-                    disabled={commandHistory.last}
-                    onClick={() => setCommandHistoryPage((p) => p + 1)}
-                  >
-                    Next
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent> */}
 
         <TabsContent value="AI Analysis" className="mt-0">
           <div className="analysis-page">
@@ -1139,19 +744,7 @@ const DeviceDetailsPage = () => {
                       </SelectContent>
                     </Select>
                   </Field>
-                  {/* <Badge tone="purple">
-                    <Icon name="ai" size={13} />
-                    AI-generated suggestions
-                  </Badge>
-                  <Button
-                    icon="plus"
-                    onClick={() => {
-                      setCurrentPage(0);
-                      setExpandedIncidentId(null);
-                    }}
-                  >
-                    New analysis
-                  </Button> */}
+
                 </>
               }
             />
@@ -1186,47 +779,18 @@ const DeviceDetailsPage = () => {
               aiAnalysisQuery?.content &&
               aiAnalysisQuery.content.length > 0 && (
                 <>
-                  {/* <div className="analysis-toolbar">
-                    <label htmlFor="analysis-page-size">Analyses per page</label>
-                    <Select
-                      value={String(pageSize)}
-                      onValueChange={(value) => {
-                        setPageSize(parseInt(value, 10));
-                        setCurrentPage(0);
-                      }}
-                    >
-                      <SelectTrigger id="analysis-page-size" className="w-24">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent align="end">
-                        {["1", "10", "25", "50", "100"].map((value) => (
-                          <SelectItem key={value} value={value}>
-                            {value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div> */}
+
 
                   <div className="analysis-layout">
                     {/* Left: incident history */}
                     <aside className="card incident-list">
-                      {/* <div className="incident-list-heading">
-                        <div>
-                          <h2>Incident history</h2>
-                          <p>
-                            {aiAnalysisQuery.totalElements ??
-                              aiAnalysisQuery.content.length}{" "}
-                            analyses
-                          </p>
-                        </div>
-                      </div> */}
+
 
                       <div className="card incident-list">
                         {aiAnalysisQuery.content.map((incident) => {
                           const severity = getSeverityStyle(incident.severity);
-                          console.log(incident.severity)
-                          console.log(severity)
+                          // console.log(incident.severity)
+                          // console.log(severity)
                           const isSelected =
                             expandedIncidentId === incident.incidentId;
 

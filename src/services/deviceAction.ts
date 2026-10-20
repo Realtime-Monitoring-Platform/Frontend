@@ -24,6 +24,7 @@ import { api } from "./api";
 
 export const fetchDeviceMetrics = async (deviceId: string, startTime: string): Promise<any> => {
     try {
+        console.log("fetchDeviceMetrics called with deviceId:", deviceId, "startTime:", startTime);
         const response = await api.get(`/query/metrics/deviceid/${deviceId}?startTime=${startTime}`);
         console.log("fetchDeviceMetrics response:", response.data);
         return response.data;

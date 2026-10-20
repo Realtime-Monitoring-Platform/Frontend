@@ -38,16 +38,27 @@ const formatBytes = (bytes?: number | null): string => {
   }
   return `${sign}${value.toFixed(value >= 100 || unit === 0 ? 0 : 1)} ${units[unit]}`;
 };
+const formatGB = (bytes?: number | null): string => {
+  if (bytes == null || !Number.isFinite(bytes)) return "—";
+  return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
+};
 
-/** Converts the kibibytes reported by the agent into bytes for {@link formatBytes} */
-const kbToBytes = (kb?: number | null): number | undefined =>
-  kb === undefined || kb === null || Number.isNaN(kb) ? undefined : kb * 1024;
+const getPercentage = (
+  used?: number | null,
+  total?: number | null
+): number => {
+  if (
+    used == null ||
+    total == null ||
+    !Number.isFinite(used) ||
+    !Number.isFinite(total) ||
+    total <= 0
+  ) {
+    return 0;
+  }
 
-const formatPercent = (value?: number | null): string =>
-  value === undefined || value === null || Number.isNaN(value)
-    ? "—"
-    : `${value.toFixed(1)}%`;
-
+  return Math.min(100, Math.max(0, (used / total) * 100));
+};
 const MetricRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex items-center justify-between gap-3">
     <span className="text-muted-foreground">{label}</span>
@@ -57,7 +68,7 @@ const MetricRow = ({ label, value }: { label: string; value: string }) => (
 
 const DeviceMetrics = ({ id }: DeviceMetricsProps) => {
   const [timeRange, setTimeRange] =
-    useState<TimeRangeValue>("-24h");
+    useState<TimeRangeValue>("-7d");
 
   const {
     data: metrics = [],
@@ -81,7 +92,7 @@ const DeviceMetrics = ({ id }: DeviceMetricsProps) => {
     staleTime: 30 * 1000,
     refetchInterval: 30 * 1000,
   });
-
+  console.log("snapshot", snapshot);
   const latest = metrics.at(-1);
 
   const currentCpu = Number((latest?.cpu ?? 0).toFixed(2));
@@ -412,13 +423,13 @@ const DeviceMetrics = ({ id }: DeviceMetricsProps) => {
                         style={{
                           width: `${Math.min(
                             100,
-                            Math.max(0, disk.used_percent ?? 0)
+                            getPercentage(disk.used_bytes, disk.total_bytes)
                           )}%`,
                         }}
                       />
                     </div>
 
-                    <b>{formatPercent(disk.used_percent)}</b>
+                    <b>{getPercentage(disk.used_bytes, disk.total_bytes).toFixed(1)}%</b>
                   </div>
 
                   <strong>
@@ -487,12 +498,11 @@ const DeviceMetrics = ({ id }: DeviceMetricsProps) => {
 
             {snapshot?.memory && (
               <Badge tone="info">
-                {snapshot.memory.total_kb  && snapshot.memory.total_kb > 0
-                  ? `${Math.round(
-                    (snapshot.memory.used_kb ?? 0 /
-                      snapshot.memory.total_kb) *
-                    100
-                  )}% used`
+                {snapshot.memory.total_kb && snapshot.memory.total_kb > 0
+                  ? `${getPercentage(
+                    snapshot?.memory?.used_kb,
+                    snapshot?.memory?.total_kb
+                  ).toFixed(1)}% used`
                   : "0% used"}
               </Badge>
             )}
@@ -502,61 +512,33 @@ const DeviceMetrics = ({ id }: DeviceMetricsProps) => {
             <div className="memory-overview">
               <div
                 className="memory-ring"
+
                 style={{
                   background: `conic-gradient(
-            var(--primary) ${snapshot.memory.total_kb && snapshot.memory.total_kb > 0
-                      ? Math.min(
-                        100,
-                        Math.max(
-                          0,
-                          (snapshot.memory.used_kb ?? 0 /
-                            snapshot.memory.total_kb) *
-                          100
-                        )
-                      )
-                      : 0
-                    }%,
-            var(--muted) 0
-          )`,
+    var(--primary) ${getPercentage(
+                    snapshot.memory.used_kb,
+                    snapshot.memory.total_kb
+                  ).toFixed(1)}%,
+    var(--muted) 0
+  )`,
                 }}
               >
                 <span>
-                  <b>
-                    {formatBytes(kbToBytes(snapshot.memory.used_kb))}
-                  </b>
-
-                  <small>
-                    of{" "}
-                    {formatBytes(kbToBytes(snapshot.memory.total_kb))}{" "}
-                    used
-                  </small>
+                  <b>{formatGB(snapshot.memory.used_kb)}</b>
+                  <small>of {formatGB(snapshot.memory.total_kb)} used</small>
                 </span>
               </div>
 
               <div className="memory-values">
                 {[
-                  [
-                    "Total",
-                    formatBytes(kbToBytes(snapshot.memory.total_kb)),
-                  ],
-                  [
-                    "Used",
-                    formatBytes(kbToBytes(snapshot.memory.used_kb)),
-                  ],
-                  [
-                    "Available",
-                    formatBytes(kbToBytes(snapshot.memory.available_kb)),
-                  ],
-                  [
-                    "Free",
-                    formatBytes(kbToBytes(snapshot.memory.free_kb)),
-                  ],
+                  ["Total", formatGB(snapshot.memory.total_kb)],
+                  ["Used", formatGB(snapshot.memory.used_kb)],
+                  ["Available", formatGB(snapshot.memory.available_kb)],
+                  ["Free", formatGB(snapshot.memory.free_kb)],
                   [
                     "Swap",
-                    `${formatBytes(
-                      kbToBytes(snapshot.memory.swap_used_kb)
-                    )} / ${formatBytes(
-                      kbToBytes(snapshot.memory.swap_total_kb)
+                    `${formatGB(snapshot.memory.swap_used_kb)} / ${formatGB(
+                      snapshot.memory.swap_total_kb
                     )}`,
                   ],
                 ].map(([name, value]) => (
