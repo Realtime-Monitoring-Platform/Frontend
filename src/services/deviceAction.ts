@@ -1,4 +1,4 @@
-import { Pagination, Device, createDeviceDto, DeviceResponse, DeviceCommand, MetricsSnapshot } from "@/types";
+import { Pagination, Device, createDeviceDto, DeviceResponse, DeviceCommand, MetricsSnapshot, Metrics } from "@/types";
 import { api } from "./api";
 
 
@@ -22,12 +22,13 @@ import { api } from "./api";
 //         }
 //     };
 
-export const fetchDeviceMetrics = async (deviceId: string, startTime: string): Promise<any> => {
+export const fetchDeviceMetrics = async (deviceId: string, startTime: string): Promise<Metrics[]> => {
     try {
         console.log("fetchDeviceMetrics called with deviceId:", deviceId, "startTime:", startTime);
         const response = await api.get(`/query/metrics/deviceid/${deviceId}?startTime=${startTime}`);
         console.log("fetchDeviceMetrics response:", response.data);
-        return response.data;
+        const data = response.data as Metrics[];
+        return Array.isArray(data) ? data : [];
     } catch (error) {
         throw new Error('Failed to fetch device metrics');
     }

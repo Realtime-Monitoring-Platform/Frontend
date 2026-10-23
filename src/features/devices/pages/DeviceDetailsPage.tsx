@@ -235,10 +235,7 @@ const DeviceDetailsPage = () => {
     <div className="detail-stats">
       <StatCard
         label="CPU utilization"
-        value={`${getPercentage(
-          snapshot?.memory?.used_kb,
-          snapshot?.memory?.total_kb
-        ).toFixed(1)} %`}
+        value={`${(snapshot?.cpu)?.toFixed(2)} %`}
       change={formatDelta(latest?.cpu, previousMetric?.cpu)}
       icon="cpu"
       tone={cpuValue >= 90 ? "red" : cpuValue >= 70 ? "orange" : "blue"}
@@ -456,33 +453,6 @@ const DeviceDetailsPage = () => {
                   {/* ))} */}
                 </section>
 
-                <section className="card recent-events">
-                  <div className="card-header">
-                    <div>
-                      <h2>Recent device events</h2>
-                      <p>Telemetry, alerts, and agent activity</p>
-                    </div>
-                  </div>
-
-                  <AlertRow
-                    severity="Critical"
-                    title="CPU temperature threshold exceeded"
-                    device="89.4°C observed for 4 minutes"
-                    time="2 min ago"
-                  />
-                  <AlertRow
-                    severity="Warning"
-                    title="CPU frequency throttled"
-                    device="Clock reduced to 1.2 GHz"
-                    time="4 min ago"
-                  />
-                  <AlertRow
-                    severity="Info"
-                    title="Configuration synchronized"
-                    device="Agent revision 1842 applied"
-                    time="28 min ago"
-                  />
-                </section>
               </div>
             </div>
           </TabsContent>
@@ -601,7 +571,7 @@ const DeviceDetailsPage = () => {
                     <thead>
                       <tr className="border-b border-border bg-muted/30 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                         <th className="px-5 py-3 font-medium">Command</th>
-                        <th className="px-4 py-3 font-medium">Requested by</th>
+                        {/* <th className="px-4 py-3 font-medium">Requested by</th> */}
                         <th className="px-4 py-3 font-medium">Started</th>
                         <th className="px-4 py-3 font-medium">Exit</th>
                         <th className="px-4 py-3 font-medium">Status</th>

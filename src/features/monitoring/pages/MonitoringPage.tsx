@@ -27,6 +27,7 @@ const MonitoringPage = () => {
       : getAllDeviceBytenanntId(user?.tenantId || '', 0, 100),
     enabled: Boolean(user && (isPlatformAdmin || user.tenantId)),
     staleTime: 30_000,
+    refetchInterval: 30_000,
   });
 
   const deviceList = devices?.content || [];
@@ -34,14 +35,15 @@ const MonitoringPage = () => {
     queryKey: ['monitoringSnapshots', deviceList.map((device) => device.id).join(',')],
     queryFn: async () => Promise.all(deviceList.map(async (device) => {
       try {
-        const metrics = await fetchDeviceMetrics(device.id, '-24h') as Metrics[];
-        return { device, metrics: metrics || [], latest: metrics?.[metrics.length - 1] };
+        const metrics = await fetchDeviceMetrics(device.id, '-24h');
+        return { device, metrics, latest: metrics[metrics.length - 1] };
       } catch {
-        return { device, metrics: [] };
+        return { device, metrics: [], latest: undefined };
       }
     })),
     enabled: deviceList.length > 0,
     staleTime: 30_000,
+    refetchInterval: 30_000,
   });
 
   const summary = useMemo(() => {
@@ -89,7 +91,7 @@ const MonitoringPage = () => {
 
   return (
     <>
-    <PageHeading title="Fleet overview" subtitle="Monitor device health, telemetry, and incidents across your organization." actions={<><Button variant="secondary" icon="docs">Export report</Button><Button icon="plus" onClick={() => {}}>Add device</Button></>} />
+    <PageHeading title="Fleet overview" subtitle="Monitor device health, telemetry, and incidents across your organization." actions={<></>} />
     <div className="stats-grid">
       <StatCard label="Total devices" value={String(deviceList.length)} change="+6.2%" icon="device" tone="blue" data="vs. last 7 days" />
       <StatCard label="Online devices" value={String(summary.online)} change="+3.1%" icon="activity" tone="green" data="of fleet" />

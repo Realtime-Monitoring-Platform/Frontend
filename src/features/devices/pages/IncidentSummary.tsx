@@ -41,8 +41,8 @@ const IncidentSummary = ({
           <h2>{incident.problem}</h2>
 
           <p>
-            <code>{incident.deviceId}</code>
-            {" · "}
+            <code></code>
+            
             Analyzed{" "}
             {new Date(incident.createdAt).toLocaleString()}
           </p>

@@ -30,8 +30,8 @@ export function FormDialog({
   cancelLabel = 'Cancel',
 }: FormDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+    <Dialog  open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-white sm:max-w-[500px]  max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}

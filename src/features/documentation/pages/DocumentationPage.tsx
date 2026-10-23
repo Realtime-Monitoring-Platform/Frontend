@@ -342,73 +342,7 @@ const sections: DocSection[] = [
       </>
     ),
   },
-  {
-    id: 'api',
-    title: 'REST API Reference',
-    icon: <KeyRound className="h-4 w-4" />,
-    keywords: 'rest api endpoints http query metrics devices latest get post reference',
-    render: () => (
-      <>
-        <H2>REST API Reference</H2>
-        <P>
-          The query service exposes read models over HTTP; the device service handles
-          provisioning and command execution. Requests are authenticated with a bearer token.
-        </P>
-        <div className="overflow-hidden rounded-lg border border-border/60">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50 text-left">
-              <tr>
-                <th className="px-4 py-2 font-medium">Method</th>
-                <th className="px-4 py-2 font-medium">Endpoint</th>
-                <th className="px-4 py-2 font-medium">Description</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/60">
-              {[
-                ['GET', '/query/devices', 'List devices (paginated).'],
-                ['GET', '/query/devices/{id}', 'Device overview by ID.'],
-                ['GET', '/query/devices/tenant/{tenantId}', 'Devices for a tenant.'],
-                ['GET', '/query/metrics/deviceid/{id}?startTime=-24h', 'Metrics history.'],
-                ['GET', '/query/metrics/latest/deviceid/{id}', 'Latest metrics snapshot.'],
-                ['POST', '/devices', 'Register a new device.'],
-                ['PUT', '/devices/{id}', 'Update a device.'],
-                ['DELETE', '/devices/{id}', 'Delete a device.'],
-                ['GET', '/devices/{id}/commands/history', 'Command execution history.'],
-              ].map(([method, endpoint, desc]) => (
-                <tr key={endpoint}>
-                  <td className="px-4 py-2">
-                    <Badge
-                      variant="outline"
-                      className={
-                        method === 'GET'
-                          ? 'border-emerald-500/40 text-emerald-500'
-                          : method === 'POST'
-                            ? 'border-sky-500/40 text-sky-500'
-                            : method === 'PUT'
-                              ? 'border-amber-500/40 text-amber-500'
-                              : 'border-rose-500/40 text-rose-500'
-                      }
-                    >
-                      {method}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-2">
-                    <Code>{endpoint}</Code>
-                  </td>
-                  <td className="px-4 py-2 text-muted-foreground">{desc}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="mb-2 mt-6 text-sm font-medium">Example — fetch the latest snapshot</p>
-        <CodeBlock
-          label="bash"
-          code={'curl -H "Authorization: Bearer <TOKEN>" \\\n  "https://<api-host>/query/metrics/latest/deviceid/<DEVICE_ID>?startTime=-24h"'}
-        />
-      </>
-    ),
-  },
+  
   {
     id: 'troubleshooting',
     title: 'Troubleshooting',

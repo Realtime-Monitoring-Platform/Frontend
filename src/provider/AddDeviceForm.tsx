@@ -278,6 +278,7 @@ const AddDeviceForm = () => {
           </Button>
           <Button
             type="submit"
+            className="text-black"
             disabled={createDeviceMutation.isPending}
           >
             {createDeviceMutation.isPending

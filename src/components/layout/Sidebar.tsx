@@ -270,7 +270,7 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
 
       {/* Organization */}
       <div className="shrink-0 px-3 py-4">
-        <button
+        {/* <button
           type="button"
           title={collapsed ? 'Organization' : undefined}
           className={`flex w-full items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.035] p-3 text-left transition hover:bg-white/[0.07] ${
@@ -295,7 +295,7 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
               <ChevronDown className="h-4 w-4 text-slate-500" />
             </>
           )}
-        </button>
+        </button> */}
       </div>
 
       {/* Navigation */}

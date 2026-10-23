@@ -141,12 +141,12 @@ const LoginPage = () => {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="h-12 w-full bg-slate-900 hover:bg-slate-800"
+          className="h-12 w-full bg-[#225dff] hover:bg-[#1b49c7] "
         >
           {isSubmitting ? 'Signing in...' : (
-            <span className="flex items-center gap-2">
+            <p className="text-white  hover:bg-[#1d4ed8] flex items-center gap-2">
               Sign in <ArrowUpRight className="h-4 w-4" />
-            </span>
+            </p>
           )}
         </Button>
       </form>

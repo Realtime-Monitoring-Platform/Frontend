@@ -200,6 +200,23 @@ export interface DeviceMetrics {
   uptime: number;
 }
 
+/** Metrics reading returned by the query-service /api/v1/query/metrics/deviceid/{deviceId} endpoint */
+export interface Metrics {
+  device_id?: string;
+  tenant_id?: string;
+  timestamp: string;
+  cpu: number;
+  ram: number;
+  memory?: {
+    total_kb?: number;
+    used_kb?: number;
+    free_kb?: number;
+    available_kb?: number;
+    swap_total_kb?: number;
+    swap_used_kb?: number;
+  };
+}
+
 export interface DeviceLog {
   id: string;
   deviceId: string;
