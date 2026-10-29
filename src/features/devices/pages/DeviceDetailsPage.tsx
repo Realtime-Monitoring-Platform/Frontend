@@ -400,52 +400,52 @@ const DeviceDetailsPage = () => {
 
 
                   <div>
-                    <h2 className="text-sm">Hostname</h2>
-                    <h2 className="text-sm">{deviceDetails?.hostname}</h2>
+                    <span className="text-xs">Hostname</span>
+                    <span className="text-xs">{deviceDetails?.hostname}</span>
 
                   </div>
                   <div className="divide-y divide-border">
-                    <h2 className="text-sm">Ip address</h2>
-                    <h2 className="text-sm">{deviceDetails?.ipAddress}</h2>
+                    <span className="text-xs">Ip address</span>
+                    <span className="text-xs">{deviceDetails?.ipAddress}</span>
 
                   </div>
                   <div>
-                    <h2 className="text-sm">MAC address</h2>
-                    <h2 className="text-sm">{deviceDetails?.macAddress}</h2>
+                    <span className="text-xs">MAC address</span>
+                    <span className="text-xs">{deviceDetails?.macAddress}</span>
 
                   </div>
                   <div>
-                    <h2 className="text-sm">CPU count</h2>
-                    <h2 className="text-sm">{deviceDetails?.cpuCount}</h2>
+                    <span className="text-xs">CPU count</span>
+                    <span className="text-xs">{deviceDetails?.cpuCount}</span>
 
                   </div>
                   <div>
-                    <h2 className="text-sm">Total memory</h2>
-                    <h2 className="text-sm text-muted-foreground">
+                    <span className="text-xs">Total memory</span>
+                    <span className="text-xs text-muted-foreground">
                       {deviceDetails?.totalMemoryKb
                         ? `${(deviceDetails.totalMemoryKb / 1024 / 1024).toFixed(2)} GB`
                         : undefined}
-                    </h2>
+                    </span>
                   </div>
                   <div>
-                    <h2 className="text-sm">OS name</h2>
-                    <h2 className="text-sm">{deviceDetails?.osName}</h2>
+                    <span className="text-xs">OS name</span>
+                    <span className="text-xs">{deviceDetails?.osName}</span>
 
                   </div>
                   <div>
-                    <h2 className="text-sm">Kernel version</h2>
-                    <h2 className="text-sm">{deviceDetails?.kernelVersion}</h2>
+                    <span className="text-xs">Kernel version</span>
+                    <span className="text-xs">{deviceDetails?.kernelVersion}</span>
 
                   </div>
                   <div>
-                    <h2 className="text-sm">Team</h2>
-                    <h2 className="text-sm">{deviceDetails?.teamName}</h2>
+                    <span className="text-xs">Team</span>
+                    <span className="text-xs">{deviceDetails?.teamName}</span>
                     {/* <InfoRow label="Team" value={deviceDetails?.teamName} />
                       <InfoRow label="Tenant" value={deviceDetails?.tenantName} /> */}
                   </div>
                   <div>
-                    <h2 className="text-sm">Tenant</h2>
-                    <h2 className="text-sm">{deviceDetails?.tenantName}</h2>
+                    <span className="text-xs">Tenant</span>
+                    <span className="text-xs">{deviceDetails?.tenantName}</span>
 
                   </div>
 
