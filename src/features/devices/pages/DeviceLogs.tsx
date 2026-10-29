@@ -7,7 +7,7 @@ interface DeviceLogsProps {
 }
 
 
-const MAX_LINES = 1000; 
+const MAX_LINES = 1000;
 // Same-origin API by default: browser -> nginx (/api) -> gateway.
 // An absolute URL is baked in only when VITE_BASE_API_URL is set (build arg).
 const Base_URL = import.meta.env.VITE_BASE_API_URL || "";
@@ -109,12 +109,12 @@ const DeviceLogs = ({ deviceId }: DeviceLogsProps) => {
             className="w-full overflow-hidden rounded-[10px] border border-[#1c2429] bg-[#0a0d10] text-[#d6e3e0] shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] font-mono"
         >
 
-            <div className="flex items-center justify-between border-b border-[#1c2429] bg-[#0f1418] px-[14px] py-[10px]    "
+            <div className="flex items-center justify-between border-b border-[#1c2429] bg-[#0f1418] px-[14px] py-[10px]  w-full  "
             >
                 <div className="flex gap-[6px]">
-                    <div className="h-[11px] w-[11px] rounded-full bg-[#3a3f45]" />
-                    <div className="h-[11px] w-[11px] rounded-full bg-[#3a3f45]" />
-                    <div className="h-[11px] w-[11px] rounded-full bg-[#3a3f45]" />
+                    <div className="h-[11px] w-[11px] rounded-full bg-[#ff1500]" />
+                    <div className="h-[11px] w-[11px] rounded-full bg-[#fefe09]" />
+                    <div className="h-[11px] w-[11px] rounded-full bg-[#0a9a00]" />
                 </div>
 
                 <div className="text-[12px] tracking-[0.4px] text-[#5c6b70]">

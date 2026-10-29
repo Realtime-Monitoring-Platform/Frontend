@@ -76,6 +76,8 @@ const DeviceDetailsPage = () => {
     refetchInterval: 5000,
   });
 
+  console.log("command hostory", commandHistory);
+
   const {
     data: aiAnalysisQuery,
     isLoading: aiAnalysisQueryisLoading,
@@ -177,7 +179,7 @@ const DeviceDetailsPage = () => {
     gcTime: 10 * 60 * 1000,
   });
   if (metrics) {
-    console.log(metrics)
+    // console.log(metrics)
   }
 
 
@@ -199,7 +201,7 @@ const DeviceDetailsPage = () => {
     const delta = current - previous;
     return `${delta > 0 ? "+" : ""}${delta.toFixed(1)}${unit}`;
   };
-  console.log(deviceId)
+  // console.log(deviceId)
   const { data: snapshot } = useQuery<MetricsSnapshot | null>({
     queryKey: ["deviceMetricsSnapshot", deviceId, timeRange],
     queryFn: () => fetchLatestDeviceMetrics(deviceId || "", timeRange),
@@ -228,18 +230,18 @@ const DeviceDetailsPage = () => {
 
     return Math.min(100, Math.max(0, (used / total) * 100));
   };
-  console.log("snapshot", snapshot)
+  // console.log("snapshot", snapshot)
   const hasMetrics = Boolean(latestMetricPoint);
-  console.log(metrics)
+  // console.log(metrics)
   const detailStats = (
     <div className="detail-stats">
       <StatCard
         label="CPU utilization"
         value={`${(snapshot?.cpu)?.toFixed(2)} %`}
-      change={formatDelta(latest?.cpu, previousMetric?.cpu)}
-      icon="cpu"
-      tone={cpuValue >= 90 ? "red" : cpuValue >= 70 ? "orange" : "blue"}
-      data="live from device"
+        change={formatDelta(latest?.cpu, previousMetric?.cpu)}
+        icon="cpu"
+        tone={cpuValue >= 90 ? "red" : cpuValue >= 70 ? "orange" : "blue"}
+        data="live from device"
       />
       <StatCard
         label="Memory usage"
@@ -247,10 +249,10 @@ const DeviceDetailsPage = () => {
           snapshot?.memory?.used_kb,
           snapshot?.memory?.total_kb
         ).toFixed(1)} %`}
-      change={formatDelta(latest?.ram, previousMetric?.ram)}
-      icon="activity"
-      tone={ramValue >= 90 ? "red" : ramValue >= 70 ? "orange" : "green"}
-      data={snapshot?.memory?.total_kb !== undefined ? `${formatGB(snapshot?.memory?.used_kb)} of ${formatGB(snapshot?.memory?.total_kb)}` : "live from device"}
+        change={formatDelta(latest?.ram, previousMetric?.ram)}
+        icon="activity"
+        tone={ramValue >= 90 ? "red" : ramValue >= 70 ? "orange" : "green"}
+        data={snapshot?.memory?.total_kb !== undefined ? `${formatGB(snapshot?.memory?.used_kb)} of ${formatGB(snapshot?.memory?.total_kb)}` : "live from device"}
       />
       <StatCard
         label="Temperature"
@@ -269,14 +271,14 @@ const DeviceDetailsPage = () => {
         change="—"
         icon="device"
         tone={diskTone}
-        data={snapshot?.disks?.[0]?.used_bytes !== undefined ? `${formatGB(snapshot?.disks?.[0]?.used_bytes)} of ${formatGB(snapshot?.disks?.[0]?.total_bytes)}` : "no disk reported" }
+        data={snapshot?.disks?.[0]?.used_bytes !== undefined ? `${formatGB(snapshot?.disks?.[0]?.used_bytes)} of ${formatGB(snapshot?.disks?.[0]?.total_bytes)}` : "no disk reported"}
       />
     </div>
   );
 
   const [tab, setTab] = useState("Overview");
   const tabs = ["Overview", "Metrics", "Logs", "AI Analysis", "Commands", "Command History"];
-  console.log(metrics)
+  // console.log(metrics)
   return (
 
 
@@ -364,25 +366,37 @@ const DeviceDetailsPage = () => {
               {detailStats}
 
               <div className="device-overview-grid w-full">
-                <section className="card w-full ">
+                <section className="card w-full h-full ">
 
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                    <CardTitle>
-                      Real-time Metrics{" "}
-                      <span className="text-muted-foreground">
+                  {/* <CardHeader className="flex flex-row items-center justify-between space-y-0"> */}
+                  {/* <CardTitle> */}
+                  {/* Real-time Metrics{" "} */}
+                  {/* <span className="text-muted-foreground">
                         (Last {timeRange.replace("-", "")})
-                      </span>
-                    </CardTitle>
+                      </span> */}
+                  {/* </CardTitle> */}
 
-                    <div className="flex gap-1">
+                  {/* <div className="flex gap-1">
 
+                    </div> */}
+                  {/* </CardHeader> */}
+                  <div className="card-header">
+                    <div>
+                      <h2>System utilization</h2>
+                      <p>Historical telemetry · last {timeRange.replace("-", "")}</p>
                     </div>
-                  </CardHeader>
-
+                    <select>
+                      <option>Last 7 hours</option>
+                      <option>Last 24 hours</option>
+                    </select>
+                  </div>
                   <CardContent>
                     <ReactECharts
+                      autoFocus={true}
+                      autoResize
+                    
                       option={trendOption}
-                      className="h-[320px] w-full"
+                      className="h-full w-full"
                       notMerge
                       lazyUpdate
                     />
@@ -390,7 +404,30 @@ const DeviceDetailsPage = () => {
 
                 </section>
 
-                <section className=" card system-info divide-y divide-border px-2">
+                {/* <section className="card detail-chart">
+                  <div className="card-header">
+                    <div>
+                      <h2>System utilization</h2>
+                      <p>Historical telemetry · last 6 hours</p>
+                    </div>
+                    <select>
+                      <option>Last 6 hours</option>
+                      <option>Last 24 hours</option>
+                    </select>
+                  </div>
+                  <div className="chart-legend">
+                    <span><i className="blue-dot" />CPU</span>
+                    <span><i className="green-dot" />Memory</span>
+                  </div><div className="detail-chart-canvas">
+                    <MiniChart /><MiniChart color="green" fill={false} />
+                  </div>
+                </section> */}
+
+
+
+
+
+                <section className=" card system-info divide-y divide-border px-2 w-full">
                   <div className="card-header">
                     <div>
                       <h2>System information</h2>
@@ -506,12 +543,12 @@ const DeviceDetailsPage = () => {
           {id && <DeviceMetrics id={id} />}
         </TabsContent>
 
-
-
+        
+        
         {/* Commands */}
         <TabsContent value="Commands" className="mt-0" id="commands">
           <Card>
-            <CardHeader className="border-b border-border/70">
+            <CardHeader className="">
               <CardTitle className="flex items-center gap-2 text-base">
                 <Terminal className="h-4 w-4 text-primary" />
                 Command terminal
@@ -520,7 +557,7 @@ const DeviceDetailsPage = () => {
                 Run approved, auditable operations on this device
               </p>
             </CardHeader>
-            <CardContent className="pt-5">
+            <CardContent className="">
               <DeviceTerminal
                 deviceId={id}
                 tenantId={deviceDetails?.tenantId}
@@ -571,7 +608,7 @@ const DeviceDetailsPage = () => {
                     <thead>
                       <tr className="border-b border-border bg-muted/30 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                         <th className="px-5 py-3 font-medium">Command</th>
-                        {/* <th className="px-4 py-3 font-medium">Requested by</th> */}
+                         <th className="px-4 py-3 font-medium">Requested by</th> 
                         <th className="px-4 py-3 font-medium">Started</th>
                         <th className="px-4 py-3 font-medium">Exit</th>
                         <th className="px-4 py-3 font-medium">Status</th>
@@ -620,7 +657,7 @@ const DeviceDetailsPage = () => {
                             </td>
                             <td className="px-4 py-3.5">
                               <Badge
-                                tone={isSuccess ? "success" : isFailed ? "danger" : "neutral"}
+                                tone={command.status === "COMPLETED" || command.status === "SENT" ? "success" : command.status === "FAILED" ? "danger" : "neutral"}
                               // className={
                               //   isSuccess
                               //     ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400"

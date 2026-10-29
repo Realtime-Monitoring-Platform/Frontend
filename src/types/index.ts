@@ -11,7 +11,7 @@ export type AlertSeverity = 'CRITICAL' | 'WARNING' | 'INFO';
 
 export type AlertStatus = 'ACTIVE' | 'ACKNOWLEDGED' | 'RESOLVED' | 'ESCALATED';
 
-export type CommandStatus = 'PENDING' | 'EXECUTING' | 'SUCCESS' | 'FAILED' | 'CANCELLED';
+export type CommandStatus = 'PENDING' | 'EXECUTING' | 'SUCCESS' | 'FAILED' | 'CANCELLED' | 'SENT' | 'WAITING_FOR_APPROVAL' | 'APPROVED' | 'REJECTED' | 'COMPLETED';
 
 export type CommandType = 'RESTART_SERVICE' | 'CLEAR_CACHE' | 'UPDATE_CONFIG' | 'RUN_DIAGNOSTIC' | 'CUSTOM' | 'FIRMWARE_UPDATE';
 

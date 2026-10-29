@@ -22,41 +22,71 @@ export const TIME_RANGES = [
     { label: '24H', value: '-24h' },
     { label: '7D', value: '-7d' },
 ] as const;
+
 export function buildTrendOption(metrics: Metrics[]) {
+    // Full timestamp kept for tooltip
     const timestamps = metrics.map((m) =>
-        new Date(m.timestamp).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
+        new Date(m.timestamp).toLocaleString([], {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
         })
     );
+
+    // Blank labels on the axis (dates hidden)
+    const axisLabels = metrics.map(() => "");
+
     const cpuData = metrics.map((m) => Number((m.cpu ?? 0).toFixed(2)));
     const ramData = metrics.map((m) => Number((m.ram ?? 0).toFixed(2)));
 
     return {
-        tooltip: { trigger: 'axis' },
-        legend: { data: ['CPU %', 'RAM %'] },
-        grid: { left: 40, right: 20, top: 40, bottom: 40 },
-        xAxis: { type: 'category', data: timestamps, boundaryGap: false },
-        yAxis: { type: 'value', axisLabel: { formatter: '{value}%' } },
+        tooltip: {
+            trigger: "axis",
+            // Show the real timestamp in the tooltip header
+            formatter: (params: any[]) => {
+                if (!params?.length) return "";
+                const idx = params[0].dataIndex;
+                const header = timestamps[idx] ?? "";
+                const rows = params
+                    .map(
+                        (p) =>
+                            `${p.marker} ${p.seriesName}: <b>${p.value}%</b>`
+                    )
+                    .join("<br/>");
+                return `${header}<br/>${rows}`;
+            },
+        },
+        legend: { data: ["CPU %", "RAM %"] },
+        grid: { left: 40, right: 20, top: 40, bottom: 50 }, // smaller bottom
+        xAxis: {
+            type: "category",
+            data: axisLabels,
+            boundaryGap: false,
+            axisLabel: { show: false },   // ← hide date labels
+            axisTick: { show: false },    // ← hide tick marks
+            axisLine: { show: true },     // keep the baseline
+        },
+        yAxis: { type: "value", axisLabel: { formatter: "{value}%" } },
         series: [
             {
-                name: 'CPU %',
-                type: 'line',
+                name: "CPU %",
+                type: "line",
                 data: cpuData,
                 smooth: true,
                 showSymbol: false,
-                lineStyle: { color: '#1976d2', width: 2 },
-                itemStyle: { color: '#1976d2' },
+                lineStyle: { color: "#1976d2", width: 2 },
+                itemStyle: { color: "#1976d2" },
             },
             {
-                name: 'RAM %',
-                type: 'line',
+                name: "RAM %",
+                type: "line",
                 data: ramData,
                 smooth: true,
                 showSymbol: false,
-                lineStyle: { color: '#2e7d32', width: 2 },
-                itemStyle: { color: '#2e7d32' },
+                lineStyle: { color: "#2e7d32", width: 2 },
+                itemStyle: { color: "#2e7d32" },
             },
         ],
     };

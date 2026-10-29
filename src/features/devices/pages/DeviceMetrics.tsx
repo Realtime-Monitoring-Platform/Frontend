@@ -447,7 +447,7 @@ const DeviceMetrics = ({ id }: DeviceMetricsProps) => {
         </section>
 
         {/* Network interfaces */}
-        <section className="card network-panel lg:col-span-3">
+        <section className="card network-panel lg:col-span-2">
           <div className="card-header">
             <div>
               <h2>Network</h2>
@@ -487,9 +487,10 @@ const DeviceMetrics = ({ id }: DeviceMetricsProps) => {
             )}
           </div>
         </section>
+       
 
         {/* Memory */}
-        <section className="card memory-panel">
+        <section className="card memory-panel lg:col-span-2">
           <div className="card-header">
             <div>
               <h2>Memory</h2>
@@ -510,18 +511,19 @@ const DeviceMetrics = ({ id }: DeviceMetricsProps) => {
 
           {snapshot?.memory ? (
             <div className="memory-overview">
+              
               <div
                 className="memory-ring"
 
-                style={{
-                  background: `conic-gradient(
-    var(--primary) ${getPercentage(
-                    snapshot.memory.used_kb,
-                    snapshot.memory.total_kb
-                  ).toFixed(1)}%,
-    var(--muted) 0
-  )`,
-                }}
+  //               style={{
+  //                 background: `conic-gradient(
+  //   var(--primary) ${getPercentage(
+  //                   snapshot.memory.used_kb,
+  //                   snapshot.memory.total_kb
+  //                 ).toFixed(1)}%,
+  //   var(--muted) 0
+  // )`,
+  //               }}
               >
                 <span>
                   <b>{formatGB(snapshot.memory.used_kb)}</b>

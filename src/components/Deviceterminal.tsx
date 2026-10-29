@@ -246,7 +246,7 @@ export default function DeviceTerminal({
   return (
     <div
       onClick={() => inputRef.current?.focus()}
-      className=" w-full max-w-[780px] overflow-hidden rounded-[10px] border border-[#1c2429] bg-[#0a0d10] text-[#d6e3e0] font-mono shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]"
+      className=" w-full  overflow-hidden rounded-[10px] border border-[#1c2429] bg-[#0a0d10] text-[#d6e3e0] font-mono shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]"
     >
       {/* title bar */}
       <div
@@ -254,9 +254,9 @@ export default function DeviceTerminal({
     "
       >
         <div className="flex gap-[6px]">
-          <div className="h-[11px] w-[11px] rounded-full bg-[#3a3f45]" />
-          <div className="h-[11px] w-[11px] rounded-full bg-[#3a3f45]" />
-          <div className="h-[11px] w-[11px] rounded-full bg-[#3a3f45]" />
+          <div className="h-[11px] w-[11px] rounded-full bg-[#ff1500]" />
+          <div className="h-[11px] w-[11px] rounded-full bg-[#fefe09]" />
+          <div className="h-[11px] w-[11px] rounded-full bg-[#0a9a00]" />
         </div>
 
         <div className="text-[12px] tracking-[0.4px] text-[#5c6b70]">

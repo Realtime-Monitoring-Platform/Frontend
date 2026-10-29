@@ -2837,7 +2837,7 @@ kbd {
   position: relative;
   border-radius: 50%;
   background:  #1d4ed8;
-   background: conic-gradient(var(--primary) 0 31%, #1d4ed8 31%) 
+   background: conic-gradient(var(--primary) 0 31%, #c2c2c2 31%) 
 }
 
 .memory-ring:after {
